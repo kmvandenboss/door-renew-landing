@@ -1,5 +1,10 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import dynamic from 'next/dynamic'
+
+const LandingPage = dynamic(() => import('../components/LandingPage'), {
+  ssr: true,
+})
 
 const Home: NextPage = () => {
   return (
@@ -10,15 +15,8 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="min-h-screen bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-4xl font-bold text-gray-900">
-            Door Renew Landing Page
-          </h1>
-          <p className="mt-4 text-xl text-gray-500">
-            Professional Door Refinishing Services
-          </p>
-        </div>
+      <main>
+        <LandingPage isLocationSpecific={false} />
       </main>
     </div>
   )
