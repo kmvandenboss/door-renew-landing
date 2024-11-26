@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, Star, Phone, Mail, Clock, MapPin, Check, ArrowRight, Shield } from 'lucide-react';
+import { Star, Check, ArrowRight, Shield } from 'lucide-react';
 
 interface FormData {
   firstName: string;
@@ -196,7 +196,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               value={formData.doorIssue}
               onChange={(e) => setFormData({...formData, doorIssue: e.target.value})}
             >
-              <option value="">What's Wrong With Your Door?</option>
+              <option value="">What&apos;s Wrong With Your Door?</option>
               <option value="weathered">Weathered/Faded</option>
               <option value="damaged">Damaged/Dented</option>
               <option value="peeling">Peeling Paint/Stain</option>
