@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Check, ArrowRight, Shield, X } from 'lucide-react';
+import { Star, Check, ArrowRight, Shield, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 
 interface FormData {
@@ -42,6 +42,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
   
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [hasScrolledToForm, setHasScrolledToForm] = useState(false);
+  const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,6 +95,18 @@ const LandingPage: React.FC<LandingPageProps> = ({
       location: "Verified Customer"
     }
   ];
+
+  const nextReview = () => {
+    setCurrentReviewIndex((prevIndex) => 
+      prevIndex === socialProof.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const previousReview = () => {
+    setCurrentReviewIndex((prevIndex) => 
+      prevIndex === 0 ? socialProof.length - 1 : prevIndex - 1
+    );
+  };
 
   const QuoteForm = () => (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -158,7 +171,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
           <option value="">Select Your Location</option>
           <option value="detroit">Detroit</option>
           <option value="chicago">Chicago</option>
-          <option value="orlando">Orlando</option>
         </select>
       )}
 
@@ -219,6 +231,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
           <Image
             src="/images/door-renew-before-after-hero-sample.jpg"
             alt="Door Refinishing Before and After Transformation"
+            width={1920}
+            height={1081}
             className="w-full object-cover max-h-[600px] rounded-lg"
           />
         </div>
@@ -241,27 +255,73 @@ const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </div>
 
-      {/* Social Proof */}
+      {/* Social Proof - Review Slider */}
       <div className="px-4 py-12 bg-white">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
             What Our Customers Say
           </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {socialProof.map((review, index) => (
-              <div key={index} className="bg-gray-50 p-6 rounded-lg">
-                <div className="flex text-yellow-400 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={16} fill="currentColor" />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-4">{review.quote}</p>
-                <div className="text-sm">
-                  <p className="font-semibold text-gray-900">{review.author}</p>
-                  <p className="text-gray-500">{review.location}</p>
-                </div>
+          <div className="relative">
+            {/* Review Cards Container */}
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out"
+                style={{ transform: `translateX(-${currentReviewIndex * 100}%)` }}
+              >
+                {socialProof.map((review, index) => (
+                  <div 
+                    key={index}
+                    className="w-full flex-shrink-0"
+                  >
+                    <div className="bg-gray-50 p-6 rounded-lg max-w-xl mx-auto">
+                      <div className="flex text-yellow-400 mb-3">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} size={16} fill="currentColor" />
+                        ))}
+                      </div>
+                      <p className="text-gray-700 mb-4 text-lg">{review.quote}</p>
+                      <div className="text-sm">
+                        <p className="font-semibold text-gray-900">{review.author}</p>
+                        <p className="text-gray-500">{review.location}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="flex justify-center items-center gap-4 mt-6">
+              <button 
+                onClick={previousReview}
+                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                aria-label="Previous review"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              
+              {/* Dot Indicators */}
+              <div className="flex gap-2">
+                {socialProof.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentReviewIndex(index)}
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                      index === currentReviewIndex ? 'bg-blue-600' : 'bg-gray-300'
+                    }`}
+                    aria-label={`Go to review ${index + 1}`}
+                  />
+                ))}
+              </div>
+
+              <button 
+                onClick={nextReview}
+                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                aria-label="Next review"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
