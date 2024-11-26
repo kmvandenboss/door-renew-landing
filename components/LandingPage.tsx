@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Star, Check, ArrowRight, Shield } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Star, Check, ArrowRight, Shield, X } from 'lucide-react';
 
 interface FormData {
   firstName: string;
@@ -38,10 +38,26 @@ const LandingPage: React.FC<LandingPageProps> = ({
     contactTime: '',
     location: ''
   });
+  
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [hasScrolledToForm, setHasScrolledToForm] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const formSection = document.getElementById('quote-form-section');
+      if (formSection) {
+        const rect = formSection.getBoundingClientRect();
+        const isVisible = rect.top <= window.innerHeight && rect.bottom >= 0;
+        setHasScrolledToForm(isVisible);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
     console.log(formData);
   };
 
@@ -78,52 +94,131 @@ const LandingPage: React.FC<LandingPageProps> = ({
     }
   ];
 
+  const QuoteForm = () => (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <div className="flex items-center justify-between gap-2 bg-green-100 text-green-800 p-3 rounded-lg">
+        <div className="flex items-center gap-2">
+          <Shield size={20} />
+          <span className="font-semibold">Get Your 100% Free Quote</span>
+        </div>
+        <button 
+          type="button" 
+          onClick={() => setIsFormVisible(false)}
+          className="md:hidden p-1 hover:bg-green-200 rounded-full"
+        >
+          <X size={20} />
+        </button>
+      </div>
+      
+      <div className="grid md:grid-cols-2 gap-4">
+        <input
+          type="text"
+          placeholder="First Name"
+          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          value={formData.firstName}
+          onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+        />
+        
+        <input
+          type="tel"
+          placeholder="Phone Number (Required)"
+          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          value={formData.phone}
+          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+        />
+      </div>
+
+      <input
+        type="email"
+        placeholder="Email Address"
+        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        value={formData.email}
+        onChange={(e) => setFormData({...formData, email: e.target.value})}
+      />
+
+      <select 
+        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        value={formData.doorIssue}
+        onChange={(e) => setFormData({...formData, doorIssue: e.target.value})}
+      >
+        <option value="">What's Wrong With Your Door?</option>
+        <option value="weathered">Weathered/Faded</option>
+        <option value="damaged">Damaged/Dented</option>
+        <option value="peeling">Peeling Paint/Stain</option>
+        <option value="other">Other Issue</option>
+      </select>
+
+      {!isLocationSpecific && (
+        <select 
+          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          value={formData.location}
+          onChange={(e) => setFormData({...formData, location: e.target.value})}
+        >
+          <option value="">Select Your Location</option>
+          <option value="detroit">Detroit</option>
+          <option value="chicago">Chicago</option>
+        </select>
+      )}
+
+      <button 
+        type="submit"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+      >
+        Get Your Free Quote Now
+        <ArrowRight size={20} />
+      </button>
+
+      <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+        <Shield size={16} />
+        <p>Your information is secure and will never be shared</p>
+      </div>
+    </form>
+  );
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <div className="relative">
-        {/* Hero Image */}
-        <div className="absolute inset-0">
-          <img
-            src="/images/door-renew-before-after-hero-sample.jpg"
-            alt="Door Refinishing Before and After"
-            className="w-full h-[600px] object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/60 to-gray-900/80" />
-        </div>
+      {/* Hero Section - Text Content */}
+      <div className="bg-white px-4 py-12 md:py-16">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center gap-2 mb-6 bg-blue-600 text-white w-fit px-4 py-2 rounded-full">
+            <Shield size={16} />
+            <span className="text-sm font-medium">Licensed & Insured Professional Service</span>
+          </div>
+          
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-gray-900">
+            Transform Your Weathered Door Into<br />
+            <span className="text-blue-600">Brand New in Just One Day</span>
+          </h1>
+          
+          <div className="text-xl md:text-2xl mb-8 text-gray-600">
+            Professional Door Refinishing & Repair Services
+            {isLocationSpecific ? 
+              <span className="block mt-2 text-blue-600 font-semibold">in {location}</span> : 
+              <span className="block mt-2">Across the United States</span>
+            }
+          </div>
 
-        {/* Hero Content */}
-        <div className="relative px-4 py-16">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center gap-2 mb-6 bg-blue-600 text-white w-fit px-4 py-2 rounded-full">
-              <Shield size={16} />
-              <span className="text-sm font-medium">Licensed & Insured Professional Service</span>
+          <div className="flex flex-wrap gap-4 mb-8">
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full">
+              <Star className="text-yellow-500" fill="currentColor" />
+              <span className="text-gray-800">4.9/5 Rating (500+ Reviews)</span>
             </div>
-            
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-white">
-              Transform Your Weathered Door Into<br />
-              <span className="text-blue-400">Brand New in Just One Day</span>
-            </h1>
-            
-            <div className="text-xl md:text-2xl mb-8 text-gray-200">
-              Professional Door Refinishing & Repair Services
-              {isLocationSpecific ? 
-                <span className="block mt-2 text-blue-400 font-semibold">in {location}</span> : 
-                <span className="block mt-2">Across the United States</span>
-              }
-            </div>
-
-            <div className="flex flex-wrap gap-4 mb-8">
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-900/50 backdrop-blur rounded-full">
-                <Star className="text-yellow-400" fill="currentColor" />
-                <span className="text-white">4.9/5 Rating (500+ Reviews)</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-900/50 backdrop-blur rounded-full">
-                <Check className="text-green-400" />
-                <span className="text-white">1000+ Doors Renewed</span>
-              </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full">
+              <Check className="text-green-500" />
+              <span className="text-gray-800">1000+ Doors Renewed</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Hero Section - Image */}
+      <div className="w-full bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <img
+            src="/images/door-renew-before-after-hero-sample.jpg"
+            alt="Door Refinishing Before and After Transformation"
+            className="w-full object-cover max-h-[600px] rounded-lg"
+          />
         </div>
       </div>
 
@@ -169,81 +264,40 @@ const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </div>
 
-      {/* Lead Form */}
-      <div className="fixed bottom-0 left-0 right-0 md:relative bg-white shadow-lg md:shadow-none border-t md:border-0">
-        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-4">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-center gap-2 bg-green-100 text-green-800 p-3 rounded-lg">
-              <Shield size={20} />
-              <span className="font-semibold">Get Your 100% Free, No-Obligation Quote</span>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="First Name"
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                value={formData.firstName}
-                onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-              />
-              
-              <input
-                type="tel"
-                placeholder="Phone Number (Required)"
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                value={formData.phone}
-                onChange={(e) => setFormData({...formData, phone: e.target.value})}
-              />
-            </div>
-
-            <input
-              type="email"
-              placeholder="Email Address"
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-            />
-
-            <select 
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              value={formData.doorIssue}
-              onChange={(e) => setFormData({...formData, doorIssue: e.target.value})}
-            >
-              <option value="">What&apos;s Wrong With Your Door?</option>
-              <option value="weathered">Weathered/Faded</option>
-              <option value="damaged">Damaged/Dented</option>
-              <option value="peeling">Peeling Paint/Stain</option>
-              <option value="other">Other Issue</option>
-            </select>
-
-            {!isLocationSpecific && (
-              <select 
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                value={formData.location}
-                onChange={(e) => setFormData({...formData, location: e.target.value})}
-              >
-                <option value="">Select Your Location</option>
-                <option value="detroit">Detroit</option>
-                <option value="chicago">Chicago</option>
-                {/* Add more locations */}
-              </select>
-            )}
-
-            <button 
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              Get Your Free Quote Now
-              <ArrowRight size={20} />
-            </button>
-
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-              <Shield size={16} />
-              <p>Your information is secure and will never be shared</p>
-            </div>
+      {/* Form Section */}
+      <div id="quote-form-section" className="px-4 py-12 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <div className={`md:block ${hasScrolledToForm ? 'block' : 'hidden'}`}>
+            <QuoteForm />
           </div>
-        </form>
+        </div>
       </div>
+
+      {/* Mobile Form Slide-up */}
+      <div className={`
+        fixed inset-x-0 bottom-0 transform md:hidden
+        ${isFormVisible ? 'translate-y-0' : 'translate-y-full'}
+        transition-transform duration-300 ease-in-out
+        bg-white shadow-lg rounded-t-xl z-50
+        max-h-[90vh] overflow-y-auto
+      `}>
+        <div className="p-4">
+          <QuoteForm />
+        </div>
+      </div>
+
+      {/* Sticky CTA Button (Mobile Only) - Hide when form is visible */}
+      {!isFormVisible && !hasScrolledToForm && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-lg md:hidden">
+          <button
+            onClick={() => setIsFormVisible(true)}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+          >
+            Get Your Free Quote
+            <ArrowRight size={20} />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
