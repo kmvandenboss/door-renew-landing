@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Star, Check, ArrowRight, Shield, X } from 'lucide-react';
+import Image from 'next/image';
 
 interface FormData {
   firstName: string;
@@ -141,7 +142,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
         value={formData.doorIssue}
         onChange={(e) => setFormData({...formData, doorIssue: e.target.value})}
       >
-        <option value="">What's Wrong With Your Door?</option>
+        <option value="">What&apos;s Wrong With Your Door?</option>
         <option value="weathered">Weathered/Faded</option>
         <option value="damaged">Damaged/Dented</option>
         <option value="peeling">Peeling Paint/Stain</option>
@@ -215,7 +216,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       {/* Hero Section - Image */}
       <div className="w-full bg-gray-50">
         <div className="max-w-4xl mx-auto px-4">
-          <img
+          <Image
             src="/images/door-renew-before-after-hero-sample.jpg"
             alt="Door Refinishing Before and After Transformation"
             className="w-full object-cover max-h-[600px] rounded-lg"
