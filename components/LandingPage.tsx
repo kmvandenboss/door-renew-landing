@@ -55,7 +55,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       description: "Complete makeover in just one day - no lengthy installations"
     },
     {
-      title: "5-Year Warranty",
+      title: "2-Year Warranty",
       description: "Peace of mind with our industry-leading warranty"
     }
   ];
@@ -81,34 +81,47 @@ const LandingPage: React.FC<LandingPageProps> = ({
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 py-16">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-2 mb-6 bg-blue-600 text-white w-fit px-4 py-2 rounded-full">
-            <Shield size={16} />
-            <span className="text-sm font-medium">Licensed & Insured Professional Service</span>
-          </div>
-          
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-            Transform Your Weathered Door Into<br />
-            <span className="text-blue-400">Brand New in Just One Day</span>
-          </h1>
-          
-          <div className="text-xl md:text-2xl mb-8 text-gray-200">
-            Professional Door Refinishing & Repair Services
-            {isLocationSpecific ? 
-              <span className="block mt-2 text-blue-400 font-semibold">in {location}</span> : 
-              <span className="block mt-2">Across the United States</span>
-            }
-          </div>
+      <div className="relative">
+        {/* Hero Image */}
+        <div className="absolute inset-0">
+          <img
+            src="/images/door-renew-before-after-hero-sample.jpg"
+            alt="Door Refinishing Before and After"
+            className="w-full h-[600px] object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/60 to-gray-900/80" />
+        </div>
 
-          <div className="flex flex-wrap gap-4 mb-8">
-            <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full">
-              <Star className="text-yellow-400" fill="currentColor" />
-              <span>4.9/5 Rating (500+ Reviews)</span>
+        {/* Hero Content */}
+        <div className="relative px-4 py-16">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center gap-2 mb-6 bg-blue-600 text-white w-fit px-4 py-2 rounded-full">
+              <Shield size={16} />
+              <span className="text-sm font-medium">Licensed & Insured Professional Service</span>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full">
-              <Check className="text-green-400" />
-              <span>1000+ Doors Renewed</span>
+            
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-white">
+              Transform Your Weathered Door Into<br />
+              <span className="text-blue-400">Brand New in Just One Day</span>
+            </h1>
+            
+            <div className="text-xl md:text-2xl mb-8 text-gray-200">
+              Professional Door Refinishing & Repair Services
+              {isLocationSpecific ? 
+                <span className="block mt-2 text-blue-400 font-semibold">in {location}</span> : 
+                <span className="block mt-2">Across the United States</span>
+              }
+            </div>
+
+            <div className="flex flex-wrap gap-4 mb-8">
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-900/50 backdrop-blur rounded-full">
+                <Star className="text-yellow-400" fill="currentColor" />
+                <span className="text-white">4.9/5 Rating (500+ Reviews)</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-900/50 backdrop-blur rounded-full">
+                <Check className="text-green-400" />
+                <span className="text-white">1000+ Doors Renewed</span>
+              </div>
             </div>
           </div>
         </div>
