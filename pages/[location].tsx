@@ -31,6 +31,14 @@ const LocationPage: NextPage<LocationPageProps> = ({ location }) => {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const locations = ['detroit', 'chicago']
+  console.log('Generating paths for locations:', locations)
+  
+  return {
+    paths: locations.map(location => ({
+      params: { location }
+    })),
+    fallback: false
+  }
   
   return {
     paths: locations.map(location => ({
