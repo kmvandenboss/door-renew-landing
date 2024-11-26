@@ -157,6 +157,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
           <option value="">Select Your Location</option>
           <option value="detroit">Detroit</option>
           <option value="chicago">Chicago</option>
+          <option value="orlando">Orlando</option>
         </select>
       )}
 
