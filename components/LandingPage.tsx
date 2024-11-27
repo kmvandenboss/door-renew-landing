@@ -85,40 +85,45 @@ const LandingPage: React.FC<LandingPageProps> = ({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setIsSubmitting(true);
-  setSubmitError(null);
-
-  try {
-    const response = await fetch('/api/submit-lead', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to submit form');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError(null);
+  
+    try {
+      const response = await fetch('/api/submit-lead', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          location: isLocationSpecific ? location?.toLowerCase() : formData.location
+        }),
+      });
+  
+      const data = await response.json().catch(() => null);
+      
+      if (!response.ok) {
+        throw new Error(data?.error || 'Failed to submit form');
+      }
+  
+      setSubmitSuccess(true);
+      setFormData({
+        firstName: '',
+        phone: '',
+        email: '',
+        doorIssue: '',
+        contactTime: '',
+        location: ''
+      });
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setSubmitError(error instanceof Error ? error.message : 'Failed to submit form');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setSubmitSuccess(true);
-    setFormData({
-      firstName: '',
-      phone: '',
-      email: '',
-      doorIssue: '',
-      contactTime: '',
-      location: ''
-    });
-  } catch (error) {
-    setSubmitError(error instanceof Error ? error.message : 'Failed to submit form');
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   const benefits: Benefit[] = [
     {
@@ -200,7 +205,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           <p>Thank you! We&apos;ll be in touch shortly.</p>
         </div>
       )}
-
+  
       <div className="flex items-center justify-between gap-2 bg-green-100 text-green-800 p-3 rounded-lg">
         <div className="flex items-center gap-2">
           <Shield size={20} />
@@ -221,7 +226,10 @@ const handleSubmit = async (e: React.FormEvent) => {
           placeholder="First Name"
           className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           value={formData.firstName}
-          onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+          onChange={(e) => {
+            const value = e.target.value;
+            setFormData(prev => ({...prev, firstName: value}));
+          }}
         />
         
         <input
@@ -229,7 +237,10 @@ const handleSubmit = async (e: React.FormEvent) => {
           placeholder="Phone Number (Required)"
           className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           value={formData.phone}
-          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+          onChange={(e) => {
+            const value = e.target.value;
+            setFormData(prev => ({...prev, phone: value}));
+          }}
         />
       </div>
   
@@ -238,13 +249,19 @@ const handleSubmit = async (e: React.FormEvent) => {
         placeholder="Email Address"
         className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         value={formData.email}
-        onChange={(e) => setFormData({...formData, email: e.target.value})}
+        onChange={(e) => {
+          const value = e.target.value;
+          setFormData(prev => ({...prev, email: value}));
+        }}
       />
   
       <select 
         className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         value={formData.doorIssue}
-        onChange={(e) => setFormData({...formData, doorIssue: e.target.value})}
+        onChange={(e) => {
+          const value = e.target.value;
+          setFormData(prev => ({...prev, doorIssue: value}));
+        }}
       >
         <option value="">What&apos;s Wrong With Your Door?</option>
         <option value="weathered">Weathered/Faded</option>
@@ -257,15 +274,19 @@ const handleSubmit = async (e: React.FormEvent) => {
         <select 
           className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           value={formData.location}
-          onChange={(e) => setFormData({...formData, location: e.target.value})}
+          onChange={(e) => {
+            const value = e.target.value;
+            setFormData(prev => ({...prev, location: value}));
+          }}
         >
           <option value="">Select Your Location</option>
           <option value="detroit">Detroit</option>
           <option value="chicago">Chicago</option>
+          <option value="orlando">Orlando</option>
         </select>
       )}
   
-  <button 
+      <button 
         type="submit"
         disabled={isSubmitting}
         className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 ${
@@ -275,7 +296,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         {isSubmitting ? 'Sending...' : 'Get Your Free Quote Now'}
         <ArrowRight size={20} />
       </button>
-
+  
       <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
         <Shield size={16} />
         <p>Your information is secure and will never be shared</p>
