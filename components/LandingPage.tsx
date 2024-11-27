@@ -258,7 +258,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
   value={formData.doorIssue}
   onChange={e => setFormData(prev => ({ ...prev, doorIssue: e.target.value }))}
 >
-  <option value="">What's Wrong With Your Door?</option>
+  <option value="">What&apos;s Wrong With Your Door?</option>
   <option value="weathered">Weathered/Faded</option>
   <option value="damaged">Damaged/Dented</option>
   <option value="peeling">Peeling Paint/Stain</option>
