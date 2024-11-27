@@ -81,10 +81,44 @@ const LandingPage: React.FC<LandingPageProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log(formData);
-  };
+  const [isSubmitting, setIsSubmitting] = useState(false);
+const [submitError, setSubmitError] = useState<string | null>(null);
+const [submitSuccess, setSubmitSuccess] = useState(false);
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+  setSubmitError(null);
+
+  try {
+    const response = await fetch('/api/submit-lead', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to submit form');
+    }
+
+    setSubmitSuccess(true);
+    setFormData({
+      firstName: '',
+      phone: '',
+      email: '',
+      doorIssue: '',
+      contactTime: '',
+      location: ''
+    });
+  } catch (error) {
+    setSubmitError(error instanceof Error ? error.message : 'Failed to submit form');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const benefits: Benefit[] = [
     {
@@ -122,7 +156,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     }
   ];
 
-  const socialProof: Review[] = [
+  const socialProof: Review[] = locationData?.content?.testimonials || [
     {
       quote: "Our 20-year-old front door looks brand new! Saved thousands compared to replacement.",
       author: "Sarah M.",

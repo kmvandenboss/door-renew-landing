@@ -3,6 +3,15 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 import { Resend } from 'resend';
 
+type Lead = {
+    firstName: string;
+    phone: string;
+    email: string;
+    doorIssue: string;
+    location?: string;
+    createdAt: Date;
+  }
+
 const prisma = new PrismaClient();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -98,7 +107,7 @@ async function isRateLimited(ip: string): Promise<boolean> {
   return false;
 }
 
-async function sendEmails(lead: any) {
+async function sendEmails(lead: Lead) {
   // Create email content
   const emailContent = `
     New Lead from Door Renew Website
