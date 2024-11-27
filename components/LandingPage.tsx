@@ -242,7 +242,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       <div className="bg-white px-4 py-8 md:py-16 min-h-[40vh] md:min-h-0 flex items-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight text-gray-900">
-            Transform Your Front Door's Beauty Without The Cost Of Replacement
+            Transform Your Front Door&apos;s Beauty Without The Cost Of Replacement
           </h1>
           
           <p className="text-xl md:text-2xl mb-6 text-gray-600">
@@ -282,10 +282,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
             Why Replace When You Can Restore?
           </h2>
           <p className="text-lg text-gray-600 mb-8">
-            Your front door tells a story. Unfortunately, time, weather, and daily use can leave that story looking worn and tired. Many homeowners assume replacement is their only option - but there's a smarter solution.
+            Your front door tells a story. Unfortunately, time, weather, and daily use can leave that story looking worn and tired. Many homeowners assume replacement is their only option - but there&apos;s a smarter solution.
           </p>
           <p className="text-lg text-gray-600 mb-8">
-            Our specialized restoration process not only preserves your door's original character but delivers outstanding results at a fraction of replacement cost. Here's why hundreds of homeowners have chosen Door Renew:
+            Our specialized restoration process not only preserves your door&apos;s original character but delivers outstanding results at a fraction of replacement cost. Here&apos;s why hundreds of homeowners have chosen Door Renew:
           </p>
         </div>
       </div>
@@ -361,7 +361,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       <div className="px-4 py-12 bg-gray-50">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
-            Your Door's Journey to Renewed Beauty
+            Your Door&apos;s Journey to Renewed Beauty
           </h2>
           <div className="space-y-8">
             {process.map((step, index) => (
@@ -401,7 +401,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
           <div className="mt-8 text-center text-gray-600">
             <p className="font-medium text-lg">Did You Know?</p>
-            <p>A quality front door can last generations with proper care. Our restoration process not only saves you money today but helps preserve your home's original character for years to come.</p>
+            <p>A quality front door can last generations with proper care. Our restoration process not only saves you money today but helps preserve your home&apos;s original character for years to come.</p>
           </div>
         </div>
       </div>
