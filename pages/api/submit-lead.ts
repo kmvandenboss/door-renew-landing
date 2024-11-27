@@ -22,11 +22,11 @@ const prisma = new PrismaClient();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Email configuration
-const MASTER_EMAIL = 'your-master-email@example.com';
+const MASTER_EMAIL = 'kevin@vandenboss.com';
 const LOCATION_EMAILS: { [key: string]: string } = {
-  detroit: 'detroit@example.com',
+  detroit: 'jim@vandenboss.com',
   chicago: 'chicago@example.com',
-  orlando: 'orlando@example.com',
+  orlando: 'trevor.templin@doorrenew.com',
 };
 
 // Basic rate limiting
@@ -129,7 +129,7 @@ async function sendEmails(lead: Lead) {
 
   // Send to master email
   await resend.emails.send({
-    from: 'Door Renew <leads@your-domain.com>',
+    from: 'Door Renew Leads<notifications@marketvibe.app>',
     to: MASTER_EMAIL,
     subject: 'New Door Renew Lead',
     text: emailContent,
@@ -138,7 +138,7 @@ async function sendEmails(lead: Lead) {
   // Send to location-specific email if applicable
   if (lead.location && LOCATION_EMAILS[lead.location]) {
     await resend.emails.send({
-      from: 'Door Renew <leads@your-domain.com>',
+      from: 'Door Renew Leads <notifications@marketvibe.app>',
       to: LOCATION_EMAILS[lead.location],
       subject: 'New Door Renew Lead',
       text: emailContent,
