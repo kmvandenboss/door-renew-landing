@@ -197,7 +197,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       
       {submitSuccess && (
         <div className="bg-green-50 text-green-800 p-3 rounded-lg">
-          <p>Thank you! We'll be in touch shortly.</p>
+          <p>Thank you! We&apos;ll be in touch shortly.</p>
         </div>
       )}
 
