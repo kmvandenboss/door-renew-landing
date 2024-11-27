@@ -4,12 +4,18 @@ import { PrismaClient } from '@prisma/client';
 import { Resend } from 'resend';
 
 type Lead = {
+    id: string;
     firstName: string;
     phone: string;
     email: string;
     doorIssue: string;
-    location?: string;
+    location: string | null;  // Changed from string | undefined to string | null
     createdAt: Date;
+    utmSource: string | null;
+    utmMedium: string | null;
+    utmCampaign: string | null;
+    userAgent: string | null;
+    ipAddress: string | null;
   }
 
 const prisma = new PrismaClient();
