@@ -221,70 +221,63 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </div>
       
       <div className="grid md:grid-cols-2 gap-4">
-        <input
-          type="text"
-          placeholder="First Name"
-          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          value={formData.firstName}
-          onChange={(e) => {
-            const value = e.target.value;
-            setFormData(prev => ({...prev, firstName: value}));
-          }}
-        />
-        
-        <input
-          type="tel"
-          placeholder="Phone Number (Required)"
-          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          value={formData.phone}
-          onChange={(e) => {
-            const value = e.target.value;
-            setFormData(prev => ({...prev, phone: value}));
-          }}
-        />
-      </div>
+  <input
+    type="text"
+    name="firstName"  // Added for autofill
+    autoComplete="given-name"  // Added for autofill
+    placeholder="First Name"
+    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+    value={formData.firstName}
+    onChange={e => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
+  />
   
-      <input
-        type="email"
-        placeholder="Email Address"
-        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        value={formData.email}
-        onChange={(e) => {
-          const value = e.target.value;
-          setFormData(prev => ({...prev, email: value}));
-        }}
-      />
-  
-      <select 
-        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        value={formData.doorIssue}
-        onChange={(e) => {
-          const value = e.target.value;
-          setFormData(prev => ({...prev, doorIssue: value}));
-        }}
-      >
-        <option value="">What&apos;s Wrong With Your Door?</option>
-        <option value="weathered">Weathered/Faded</option>
-        <option value="damaged">Damaged/Dented</option>
-        <option value="peeling">Peeling Paint/Stain</option>
-        <option value="other">Other Issue</option>
-      </select>
-  
-      {!isLocationSpecific && (
-        <select 
-          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          value={formData.location}
-          onChange={(e) => {
-            const value = e.target.value;
-            setFormData(prev => ({...prev, location: value}));
-          }}
-        >
-          <option value="">Select Your Location</option>
-          <option value="detroit">Detroit</option>
-          <option value="chicago">Chicago</option>
-          <option value="orlando">Orlando</option>
-        </select>
-      )}
+  <input
+    type="tel"
+    name="phone"  // Added for autofill
+    autoComplete="tel"  // Added for autofill
+    placeholder="Phone Number (Required)"
+    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+    value={formData.phone}
+    onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+  />
+</div>
+
+<input
+  type="email"
+  name="email"  // Added for autofill
+  autoComplete="email"  // Added for autofill
+  placeholder="Email Address"
+  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  value={formData.email}
+  onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
+/>
+
+<select 
+  name="doorIssue"  // Added for consistency
+  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  value={formData.doorIssue}
+  onChange={e => setFormData(prev => ({ ...prev, doorIssue: e.target.value }))}
+>
+  <option value="">What's Wrong With Your Door?</option>
+  <option value="weathered">Weathered/Faded</option>
+  <option value="damaged">Damaged/Dented</option>
+  <option value="peeling">Peeling Paint/Stain</option>
+  <option value="other">Other Issue</option>
+</select>
+
+{!isLocationSpecific && (
+  <select 
+    name="location"  // Added for consistency
+    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+    value={formData.location}
+    onChange={e => setFormData(prev => ({ ...prev, location: e.target.value }))}
+  >
+    <option value="">Select Your Location</option>
+    <option value="detroit">Detroit</option>
+    <option value="chicago">Chicago</option>
+    <option value="orlando">Orlando</option>
+  </select>
+)}
   
       <button 
         type="submit"
