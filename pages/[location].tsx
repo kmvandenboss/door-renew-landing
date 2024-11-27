@@ -1,63 +1,65 @@
+// pages/[location].tsx
+
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next'
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
+import { getLocations, getLocationBySlug, LocationConfig } from '../config/locations'
 
 const LandingPage = dynamic(() => import('../components/LandingPage'), {
   ssr: true,
 })
 
 interface LocationPageProps {
-  location: string;
+  locationData: LocationConfig;
 }
 
-const LocationPage: NextPage<LocationPageProps> = ({ location }) => {
+const LocationPage: NextPage<LocationPageProps> = ({ locationData }) => {
   return (
     <div>
       <Head>
-        <title>Door Renew {location} - Professional Door Refinishing</title>
+        <title>{locationData.meta.title}</title>
         <meta 
           name="description" 
-          content={`Transform your old door into new in just one day. Serving ${location} and surrounding areas.`} 
+          content={locationData.meta.description}
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main>
-        <LandingPage isLocationSpecific={true} location={location} />
+        <LandingPage 
+          isLocationSpecific={true} 
+          location={locationData.name}
+          locationData={locationData}  // Pass the full location data to the component
+        />
       </main>
     </div>
   )
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const locations = ['detroit', 'chicago', 'orlando']
-  console.log('Generating paths for locations:', locations)
+  const locations = getLocations()
   
   return {
     paths: locations.map(location => ({
-      params: { location }
-    })),
-    fallback: false
-  }
-  
-  return {
-    paths: locations.map(location => ({
-      params: { location }
+      params: { location: location.slug }
     })),
     fallback: false
   }
 }
 
 export const getStaticProps: GetStaticProps<LocationPageProps> = async ({ params }) => {
-  const location = params?.location as string
-  const formattedLocation = location
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
+  const locationSlug = params?.location as string
+  const locationData = getLocationBySlug(locationSlug)
+
+  if (!locationData) {
+    return {
+      notFound: true
+    }
+  }
 
   return {
     props: {
-      location: formattedLocation
+      locationData
     }
   }
 }

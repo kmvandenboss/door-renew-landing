@@ -13,6 +13,7 @@ import {
   Wrench
 } from 'lucide-react';
 import Image from 'next/image';
+import { LocationConfig } from '../config/locations';
 
 interface FormData {
   firstName: string;
@@ -26,6 +27,7 @@ interface FormData {
 interface LandingPageProps {
   isLocationSpecific?: boolean;
   location?: string;
+  locationData?: LocationConfig;
 }
 
 interface Benefit {
@@ -48,7 +50,8 @@ interface Process {
 
 const LandingPage: React.FC<LandingPageProps> = ({ 
   isLocationSpecific = false, 
-  location = '' 
+  location = '',
+  locationData 
 }) => {
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
