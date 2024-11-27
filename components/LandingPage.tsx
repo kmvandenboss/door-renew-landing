@@ -53,14 +53,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
   location = '',
   locationData 
 }) => {
-  const [formData, setFormData] = useState<FormData>({
-    firstName: '',
-    phone: '',
-    email: '',
-    doorIssue: '',
-    contactTime: '',
-    location: ''
-  });
   
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [hasScrolledToForm, setHasScrolledToForm] = useState(false);
@@ -81,49 +73,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitError(null);
-  
-    try {
-      const response = await fetch('/api/submit-lead', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          location: isLocationSpecific ? location?.toLowerCase() : formData.location
-        }),
-      });
-  
-      const data = await response.json().catch(() => null);
-      
-      if (!response.ok) {
-        throw new Error(data?.error || 'Failed to submit form');
-      }
-  
-      setSubmitSuccess(true);
-      setFormData({
-        firstName: '',
-        phone: '',
-        email: '',
-        doorIssue: '',
-        contactTime: '',
-        location: ''
-      });
-    } catch (error) {
-      console.error('Form submission error:', error);
-      setSubmitError(error instanceof Error ? error.message : 'Failed to submit form');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const benefits: Benefit[] = [
     {
