@@ -2,6 +2,7 @@
 
 ## Root Directory Files
 
+- `.env` - Environment variables configuration
 - `.eslintrc.json` - ESLint configuration for code linting
 - `.gitignore` - Specifies which files Git should ignore
 - `next.config.js` - Next.js configuration file
@@ -24,6 +25,7 @@ Next.js pages directory (file-based routing)
 - `index.tsx` - Homepage
 - `/api`
   - `hello.ts` - Example API route
+  - `submit-lead.ts` - API endpoint for lead submission
 - `/fonts`
   - `GeistMonoVF.woff` - Geist Mono variable font
   - `GeistVF.woff` - Geist variable font
@@ -47,5 +49,9 @@ Styling files
 Configuration directory
 - `locations.ts` - Configuration file for location-specific data
 
+### `/prisma`
+Database configuration and schema
+- `schema.prisma` - Prisma database schema definition
+
 ## Project Overview
-This is a Next.js project with TypeScript integration, using Tailwind CSS for styling. The project follows a standard Next.js file structure with pages-based routing and component-based architecture. It includes custom fonts (Geist), various SVG assets, and image resources for the door renovation landing page.
+This is a Next.js project with TypeScript integration, using Tailwind CSS for styling and Prisma for database management. The project follows a standard Next.js file structure with pages-based routing and component-based architecture. It includes custom fonts (Geist), various SVG assets, and image resources for the door renovation landing page.
