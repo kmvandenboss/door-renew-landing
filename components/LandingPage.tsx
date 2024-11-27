@@ -82,8 +82,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
   }, []);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-const [submitError, setSubmitError] = useState<string | null>(null);
-const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -189,6 +189,18 @@ const handleSubmit = async (e: React.FormEvent) => {
   // Form component remains unchanged
   const QuoteForm = () => (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {submitError && (
+        <div className="bg-red-50 text-red-800 p-3 rounded-lg">
+          <p>{submitError}</p>
+        </div>
+      )}
+      
+      {submitSuccess && (
+        <div className="bg-green-50 text-green-800 p-3 rounded-lg">
+          <p>Thank you! We'll be in touch shortly.</p>
+        </div>
+      )}
+
       <div className="flex items-center justify-between gap-2 bg-green-100 text-green-800 p-3 rounded-lg">
         <div className="flex items-center gap-2">
           <Shield size={20} />
@@ -253,14 +265,17 @@ const handleSubmit = async (e: React.FormEvent) => {
         </select>
       )}
   
-      <button 
+  <button 
         type="submit"
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+        disabled={isSubmitting}
+        className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 ${
+          isSubmitting ? 'opacity-75 cursor-not-allowed' : ''
+        }`}
       >
-        Get Your Free Quote Now
+        {isSubmitting ? 'Sending...' : 'Get Your Free Quote Now'}
         <ArrowRight size={20} />
       </button>
-  
+
       <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
         <Shield size={16} />
         <p>Your information is secure and will never be shared</p>
