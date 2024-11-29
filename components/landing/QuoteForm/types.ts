@@ -1,4 +1,3 @@
-import { LocationConfig } from '@/config/locations';
 
 export interface QuoteFormProps {
   isLocationSpecific?: boolean;
