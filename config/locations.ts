@@ -89,7 +89,7 @@ export interface LocationConfig {
           serviceAreas: 'Serving Orlando and surrounding areas including Maitland, Winter Park, Altamonte Springs, Oviedo, Kissimmee, Winter Garden, Windermere, Lake Nona, Ocala, Daytona, Longwood, Dr. Phillips, and Melbourne.',
           testimonials: [
             {
-              quote: "I&apos;ve told everyone I know about Door Renew. They literally saved me thousands of dollars. My two-door front entry was custom made when our home was built. It didn&apos;t weather well and I was worried I needed to buy a new front door. This was worth every penny.",
+              quote: "I've told everyone I know about Door Renew. They literally saved me thousands of dollars. My two-door front entry was custom made when our home was built. It didn't weather well and I was worried I needed to buy a new front door. This was worth every penny.",
               author: "Reba M.",
               location: "Orlando, FL"
             }

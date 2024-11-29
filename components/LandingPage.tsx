@@ -13,22 +13,8 @@ import {
   Wrench
 } from 'lucide-react';
 import Image from 'next/image';
-import { LocationConfig } from '../config/locations';
-
-interface FormData {
-  firstName: string;
-  phone: string;
-  email: string;
-  doorIssue: string;
-  contactTime: string;
-  location: string;
-}
-
-interface LandingPageProps {
-  isLocationSpecific?: boolean;
-  location?: string;
-  locationData?: LocationConfig;
-}
+import { LocationConfig } from '@/config/locations';
+import QuoteForm from '@/components/landing/QuoteForm';
 
 interface Benefit {
   title: string;
@@ -46,6 +32,12 @@ interface Process {
   title: string;
   description: string;
   icon: React.ReactNode;
+}
+
+interface LandingPageProps {
+  isLocationSpecific?: boolean;
+  location?: string;
+  locationData?: LocationConfig;
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ 
@@ -140,179 +132,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
     );
   };
 
-  // Form component remains unchanged
-  const QuoteForm = () => {
-    // Move form state into the form component
-    const [formState, setFormState] = useState<FormData>({
-      firstName: '',
-      phone: '',
-      email: '',
-      doorIssue: '',
-      contactTime: '',
-      location: ''
-    });
-    
-    const [submissionState, setSubmissionState] = useState({
-      isSubmitting: false,
-      error: null as string | null,
-      success: false
-    });
-  
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setSubmissionState(prev => ({ ...prev, isSubmitting: true, error: null }));
-    
-      try {
-        const response = await fetch('/api/submit-lead', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ...formState,
-            location: isLocationSpecific ? location?.toLowerCase() : formState.location
-          }),
-        });
-    
-        const data = await response.json().catch(() => null);
-        
-        if (!response.ok) {
-          throw new Error(data?.error || 'Failed to submit form');
-        }
-    
-        setSubmissionState(prev => ({ ...prev, success: true, isSubmitting: false }));
-        setFormState({
-          firstName: '',
-          phone: '',
-          email: '',
-          doorIssue: '',
-          contactTime: '',
-          location: ''
-        });
-      } catch (error) {
-        console.error('Form submission error:', error);
-        setSubmissionState(prev => ({
-          ...prev,
-          error: error instanceof Error ? error.message : 'Failed to submit form',
-          isSubmitting: false
-        }));
-      }
-    };
-  
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const { name, value } = e.target;
-      setFormState(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    };
-  
-    return (
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {submissionState.error && (
-          <div className="bg-red-50 text-red-800 p-3 rounded-lg">
-            <p>{submissionState.error}</p>
-          </div>
-        )}
-        
-        {submissionState.success && (
-          <div className="bg-green-50 text-green-800 p-3 rounded-lg">
-            <p>Thank you! We&apos;ll be in touch shortly.</p>
-          </div>
-        )}
-    
-        <div className="flex items-center justify-between gap-2 bg-green-100 text-green-800 p-3 rounded-lg">
-          <div className="flex items-center gap-2">
-            <Shield size={20} />
-            <span className="font-semibold">Get Your 100% Free Quote</span>
-          </div>
-          <button 
-            type="button" 
-            onClick={() => setIsFormVisible(false)}
-            className="md:hidden p-1 hover:bg-green-200 rounded-full"
-          >
-            <X size={20} />
-          </button>
-        </div>
-        
-        <div className="grid md:grid-cols-2 gap-4">
-          <input
-            type="text"
-            name="firstName"
-            autoComplete="given-name"
-            placeholder="First Name"
-            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            value={formState.firstName}
-            onChange={handleInputChange}
-          />
-          
-          <input
-            type="tel"
-            name="phone"
-            autoComplete="tel"
-            placeholder="Phone Number (Required)"
-            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            value={formState.phone}
-            onChange={handleInputChange}
-          />
-        </div>
-  
-        <input
-          type="email"
-          name="email"
-          autoComplete="email"
-          placeholder="Email Address"
-          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          value={formState.email}
-          onChange={handleInputChange}
-        />
-  
-        <select 
-          name="doorIssue"
-          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          value={formState.doorIssue}
-          onChange={handleInputChange}
-        >
-          <option value="">What&apos;s Wrong With Your Door?</option>
-          <option value="weathered">Weathered/Faded</option>
-          <option value="damaged">Damaged/Dented</option>
-          <option value="peeling">Peeling Paint/Stain</option>
-          <option value="other">Other Issue</option>
-        </select>
-  
-        {!isLocationSpecific && (
-          <select 
-            name="location"
-            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            value={formState.location}
-            onChange={handleInputChange}
-          >
-            <option value="">Select Your Location</option>
-            <option value="detroit">Detroit</option>
-            <option value="chicago">Chicago</option>
-            <option value="orlando">Orlando</option>
-          </select>
-        )}
-      
-        <button 
-          type="submit"
-          disabled={submissionState.isSubmitting}
-          className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 ${
-            submissionState.isSubmitting ? 'opacity-75 cursor-not-allowed' : ''
-          }`}
-        >
-          {submissionState.isSubmitting ? 'Sending...' : 'Get Your Free Quote Now'}
-          <ArrowRight size={20} />
-        </button>
-    
-        <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-          <Shield size={16} />
-          <p>Your information is secure and will never be shared</p>
-        </div>
-      </form>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-white">
       {/* Top Banner */}
@@ -373,21 +192,21 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </div>
 
       {/* Benefits Section */}
-<div className="px-4 py-12 bg-gray-50">
-  <div className="max-w-4xl mx-auto">
-    <div className="grid md:grid-cols-3 gap-6">
-      {benefits.map((benefit, index) => (
-        <div key={index} className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="flex-shrink-0">{benefit.icon}</div>
-            <h3 className="text-xl font-semibold">{benefit.title}</h3>
+      <div className="px-4 py-12 bg-gray-50">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6">
+            {benefits.map((benefit, index) => (
+              <div key={index} className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <div className="flex items-center gap-4 mb-2">
+                  <div className="flex-shrink-0">{benefit.icon}</div>
+                  <h3 className="text-xl font-semibold">{benefit.title}</h3>
+                </div>
+                <p className="text-gray-600">{benefit.description}</p>
+              </div>
+            ))}
           </div>
-          <p className="text-gray-600">{benefit.description}</p>
         </div>
-      ))}
-    </div>
-  </div>
-</div>
+      </div>
 
       {/* Recent Transformations */}
       <div className="px-4 py-12 bg-white">
@@ -396,19 +215,34 @@ const LandingPage: React.FC<LandingPageProps> = ({
             Recent Transformations
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((_, index) => (
+            {[
+              {
+                src: '/images/door-renew-before-after-2.jpg',
+                alt: 'Door Transformation - Classic Wood Restoration'
+              },
+              {
+                src: '/images/door-renew-before-after-4.jpg',
+                alt: 'Door Transformation - Complete Surface Renewal'
+              },
+              {
+                src: '/images/door-renew-before-after-6.jpg',
+                alt: 'Door Transformation - Professional Refinishing'
+              }
+            ].map((image, index) => (
               <div 
                 key={index}
                 className="cursor-pointer transition-transform hover:scale-105"
-                onClick={() => setSelectedImage(`/images/door-renew-before-after-hero-sample.jpg`)}
+                onClick={() => setSelectedImage(image.src)}
               >
-                <Image
-                  src="/images/door-renew-before-after-hero-sample.jpg"
-                  alt={`Door Transformation ${index + 1}`}
-                  width={400}
-                  height={300}
-                  className="rounded-lg shadow-md"
-                />
+                <div className="aspect-[4/3] relative overflow-hidden rounded-lg shadow-md">
+                  <Image
+                    src={image.src}
+                    alt={image.alt}
+                    fill={true}
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw"
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -569,7 +403,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
       Get your free, no-obligation assessment
     </p>
     <div className={`${hasScrolledToForm ? 'block' : 'hidden'}`}>
-      <QuoteForm />
+      <QuoteForm 
+        isLocationSpecific={isLocationSpecific} 
+        location={location} 
+      />
     </div>
   </div>
 </div>
@@ -579,7 +416,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
   <div className="bg-white rounded-lg shadow-xl">
     <div className="p-6">
       <h3 className="text-xl font-bold mb-4">Get Your Free Quote</h3>
-      <QuoteForm />
+      <QuoteForm 
+        isLocationSpecific={isLocationSpecific} 
+        location={location} 
+      />
     </div>
   </div>
 </div>
@@ -595,17 +435,20 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </div>
 
       {/* Mobile Form Slide-up */}
-      <div className={`
-        fixed inset-x-0 bottom-0 transform md:hidden
-        ${isFormVisible ? 'translate-y-0' : 'translate-y-full'}
-        transition-transform duration-300 ease-in-out
-        bg-white shadow-lg rounded-t-xl z-40
-        max-h-[90vh] overflow-y-auto
-     `}>
-        <div className="p-4">
-          <QuoteForm />
-        </div>
-      </div>
+<div className={`
+  fixed inset-x-0 bottom-0 transform md:hidden
+  ${isFormVisible ? 'translate-y-0' : 'translate-y-full'}
+  transition-transform duration-300 ease-in-out
+  bg-white shadow-lg rounded-t-xl z-40
+  max-h-[90vh] overflow-y-auto
+`}>
+  <div className="p-4">
+    <QuoteForm 
+      isLocationSpecific={isLocationSpecific} 
+      location={location} 
+    />
+  </div>
+</div>
 
       {/* Sticky CTA Button (Mobile Only) - Hide when form is visible */}
       {!isFormVisible && !hasScrolledToForm && (
