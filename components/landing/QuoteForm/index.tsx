@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, X, ArrowRight } from 'lucide-react';
+import { Shield, ArrowRight } from 'lucide-react';
 import { QuoteFormProps, FormData, SubmissionState } from './types';
 
 const QuoteForm: React.FC<QuoteFormProps> = ({ 
