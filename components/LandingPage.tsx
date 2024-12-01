@@ -16,6 +16,7 @@ import Image from 'next/image';
 import { LocationConfig } from '@/config/locations';
 import QuoteForm from '@/components/landing/QuoteForm';
 import EnhancedBanner from './EnhancedBanner';
+import Link from 'next/link';
 
 interface Benefit {
   title: string;
@@ -428,14 +429,19 @@ const LandingPage: React.FC<LandingPageProps> = ({
 </div>
 
       {/* Footer */}
-      <div className="px-4 py-8 bg-gray-50 text-center text-gray-600">
-        <div className="max-w-4xl mx-auto">
-          <p className="mb-2">Locally owned and operated by craftsmen in your community</p>
-          {isLocationSpecific && (
-            <p>Proudly serving {location} and surrounding areas</p>
-          )}
-        </div>
-      </div>
+<div className="px-4 py-8 bg-gray-50 text-center text-gray-600">
+  <div className="max-w-4xl mx-auto">
+    <p className="mb-2">Locally owned and operated by craftsmen in your community</p>
+    {isLocationSpecific && (
+      <p className="mb-4">Proudly serving {location} and surrounding areas</p>
+    )}
+    <div className="text-sm">
+      <Link href="/privacy-policy" className="text-blue-600 hover:text-blue-800 transition-colors">
+        Privacy Policy
+      </Link>
+    </div>
+  </div>
+</div>
 
       {/* Mobile Form Slide-up */}
 <div className={`

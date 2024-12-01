@@ -16,6 +16,7 @@
 ### `/components`
 Contains reusable React components
 - `LandingPage.tsx` - Main landing page component
+- `EnhancedBanner.tsx` - Enhanced banner component for improved visual presentation
 - `/landing` - Landing page specific components
   - `/QuoteForm` - Quote form component directory
     - `index.tsx` - Quote form component implementation
