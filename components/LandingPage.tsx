@@ -136,6 +136,19 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
   return (
     <div className="min-h-screen bg-white">
+
+<div className="flex items-center justify-center md:justify-between px-6 py-4 bg-white border-b">
+  <Link href="/" className="flex items-center">
+    <Image
+      src="/images/door-renew-logo.png"
+      alt="Door Renew Logo"
+      width={120} // Made slightly smaller by default
+      height={60}
+      className="h-auto w-auto md:w-[150px]" // Larger on desktop
+      priority
+    />
+  </Link>
+</div>
       {/* Top Banner */}
       <EnhancedBanner 
   isLocationSpecific={isLocationSpecific} 
@@ -153,17 +166,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
           <p className="text-xl md:text-2xl mb-6 text-gray-600">
             Save thousands while restoring your door to its original elegance. Our craftsmen bring new life to worn, weathered doors at a fraction of replacement cost.
           </p>
-
-          <div className="flex flex-wrap gap-4 mb-8">
-            <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full">
-              <Star className="text-yellow-500" fill="currentColor" />
-              <span className="text-gray-800">4.9/5 Rating</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full">
-              <Check className="text-green-500" />
-              <span className="text-gray-800">1000+ Doors Restored</span>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -431,6 +433,17 @@ const LandingPage: React.FC<LandingPageProps> = ({
       {/* Footer */}
 <div className="px-4 py-8 bg-gray-50 text-center text-gray-600">
   <div className="max-w-4xl mx-auto">
+    {/* Add logo here, centered above existing content */}
+    <div className="mb-6">
+      <Image
+        src="/images/door-renew-logo.png"
+        alt="Door Renew Logo"
+        width={120}
+        height={60}
+        className="h-auto w-auto mx-auto" // mx-auto centers the image
+      />
+    </div>
+    
     <p className="mb-2">Locally owned and operated by craftsmen in your community</p>
     {isLocationSpecific && (
       <p className="mb-4">Proudly serving {location} and surrounding areas</p>

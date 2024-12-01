@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone } from 'lucide-react';
+import { Phone, Star, Check } from 'lucide-react';
 
 // Removed location from CallButtonProps since it's not used
 interface CallButtonProps {
@@ -95,11 +95,26 @@ const EnhancedBanner: React.FC<EnhancedBannerProps> = ({
         {isLocationSpecific ? `${location}'s` : "America's"} Trusted Door Restoration Experts
       </div>
       
+      {/* Trust indicators */}
+    <div className="flex items-center justify-center gap-4 mt-2 text-sm text-blue-800">
+      <div className="flex items-center gap-1">
+        <Star className="text-yellow-500 w-4 h-4" fill="currentColor" />
+        <span>4.9/5 Rating</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <Check className="text-green-500 w-4 h-4" />
+        <span>1000+ Doors Restored</span>
+      </div>
+    </div>
+      
+      
       {showCallButton && phoneNumber && (
+        <div className="mt-4"> {/* Changed from mt-3 to mt-4 for more spacing */}
         <CallButton 
           phoneNumber={phoneNumber}
           onCallClick={handleCallClick}
         />
+      </div>
       )}
     </div>
   );
