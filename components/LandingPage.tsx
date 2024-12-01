@@ -54,6 +54,24 @@ const LandingPage: React.FC<LandingPageProps> = ({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
+    if (isLocationSpecific && location) {
+      // Send ViewContent event
+      fetch('/api/track-view', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          location: location,
+          url: window.location.href,
+        }),
+      }).catch(error => {
+        console.error('Error sending view event:', error);
+      });
+    }
+  }, [isLocationSpecific, location]); // Only run when location changes
+
+  useEffect(() => {
     const handleScroll = () => {
       const formSection = document.getElementById('quote-form-section');
       if (formSection) {
