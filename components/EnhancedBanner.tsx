@@ -1,21 +1,19 @@
 import React, { useState } from 'react';
 import { Phone } from 'lucide-react';
 
-// Add interface for CallButton props
+// Removed location from CallButtonProps since it's not used
 interface CallButtonProps {
   phoneNumber: string;
-  location: string;
   onCallClick: () => void;
 }
 
-// Add type declaration for gtag
 declare global {
   interface Window {
     gtag: (event: string, action: string, params: object) => void;
   }
 }
 
-const CallButton: React.FC<CallButtonProps> = ({ phoneNumber, location, onCallClick }) => {
+const CallButton: React.FC<CallButtonProps> = ({ phoneNumber, onCallClick }) => {
   const [isNumberVisible, setIsNumberVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -100,7 +98,6 @@ const EnhancedBanner: React.FC<EnhancedBannerProps> = ({
       {showCallButton && phoneNumber && (
         <CallButton 
           phoneNumber={phoneNumber}
-          location={location}
           onCallClick={handleCallClick}
         />
       )}
