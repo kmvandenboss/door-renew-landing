@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { Shield, ArrowRight } from 'lucide-react';
-import { QuoteFormProps, FormData, SubmissionState } from './types';
+import React, { useState, useCallback } from 'react';
+import { Shield, ArrowRight, Upload, X } from 'lucide-react';
+import { QuoteFormProps, LeadFormData, SubmissionState, SecondStepData, ImagePreview } from './types';
+import { MAX_FILES } from '@/utils/upload';
 
 const QuoteForm: React.FC<QuoteFormProps> = ({ 
   isLocationSpecific = false, 
   location 
 }) => {
-  const [formState, setFormState] = useState<FormData>({
+  const [formState, setFormState] = useState<LeadFormData>({
     firstName: '',
     phone: '',
     email: '',
@@ -15,10 +16,19 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
     location: ''
   });
   
+  const [secondStepData, setSecondStepData] = useState<SecondStepData>({
+    images: [],
+    comments: ''
+  });
+
+  const [imagePreview, setImagePreview] = useState<ImagePreview[]>([]);
+  
   const [submissionState, setSubmissionState] = useState<SubmissionState>({
     isSubmitting: false,
     error: null,
-    success: false
+    success: false,
+    showSecondStep: false,
+    secondStepSubmitted: false
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,21 +47,18 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
         }),
       });
   
-      const data = await response.json().catch(() => null);
+      const data = await response.json();
       
       if (!response.ok) {
         throw new Error(data?.error || 'Failed to submit form');
       }
   
-      setSubmissionState(prev => ({ ...prev, success: true, isSubmitting: false }));
-      setFormState({
-        firstName: '',
-        phone: '',
-        email: '',
-        doorIssue: '',
-        contactTime: '',
-        location: ''
-      });
+      setSubmissionState(prev => ({ 
+        ...prev, 
+        success: true, 
+        isSubmitting: false,
+        showSecondStep: true 
+      }));
     } catch (error) {
       console.error('Form submission error:', error);
       setSubmissionState(prev => ({
@@ -62,13 +69,228 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleSecondStepSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmissionState(prev => ({ ...prev, isSubmitting: true, error: null }));
+  
+    try {
+      let imageUrls: string[] = [];
+      
+      // Upload images if any exist
+      if (secondStepData.images.length > 0) {
+        const formData = new FormData();
+        secondStepData.images.forEach((file) => {
+          formData.append('images', file);
+        });
+  
+        const uploadResponse = await fetch('/api/upload-images', {
+          method: 'POST',
+          body: formData,
+        });
+  
+        const uploadResult = await uploadResponse.json();
+        
+        if (!uploadResponse.ok) {
+          throw new Error(uploadResult.error || 'Failed to upload images');
+        }
+  
+        imageUrls = uploadResult.urls;
+      }
+  
+      // Update lead with images and comments
+      const response = await fetch('/api/update-lead', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formState.email,
+          imageUrls,
+          comments: secondStepData.comments
+        }),
+      });
+  
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data?.error || 'Failed to submit additional information');
+      }
+  
+      setSubmissionState(prev => ({ 
+        ...prev, 
+        secondStepSubmitted: true,
+        isSubmitting: false 
+      }));
+    } catch (error) {
+      console.error('Second step submission error:', error);
+      setSubmissionState(prev => ({
+        ...prev,
+        error: error instanceof Error ? error.message : 'Failed to submit additional information',
+        isSubmitting: false
+      }));
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormState(prev => ({
       ...prev,
       [name]: value
     }));
   };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newFiles = Array.from(files);
+    const totalFiles = secondStepData.images.length + newFiles.length;
+
+    if (totalFiles > MAX_FILES) {
+      setSubmissionState(prev => ({
+        ...prev,
+        error: `Maximum ${MAX_FILES} files allowed`
+      }));
+      return;
+    }
+
+    // Create image previews
+    const newPreviews = newFiles.map(file => ({
+      file,
+      preview: URL.createObjectURL(file)
+    }));
+
+    setImagePreview(prev => [...prev, ...newPreviews]);
+    setSecondStepData(prev => ({
+      ...prev,
+      images: [...prev.images, ...newFiles]
+    }));
+  };
+
+  const removeImage = useCallback((index: number) => {
+    URL.revokeObjectURL(imagePreview[index].preview);
+    setImagePreview(prev => prev.filter((_, i) => i !== index));
+    setSecondStepData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  }, [imagePreview]);
+
+  const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setSecondStepData(prev => ({
+      ...prev,
+      comments: e.target.value
+    }));
+  };
+
+  // Cleanup function for image previews
+  React.useEffect(() => {
+    return () => {
+      imagePreview.forEach(preview => {
+        URL.revokeObjectURL(preview.preview);
+      });
+    };
+  }, []);
+
+  if (submissionState.secondStepSubmitted) {
+    return (
+      <div className="bg-green-50 text-green-800 p-6 rounded-lg text-center">
+        <h3 className="font-semibold text-lg mb-2">Thank you!</h3>
+        <p>We've received your additional information and will be in touch shortly.</p>
+      </div>
+    );
+  }
+
+  if (submissionState.showSecondStep) {
+    return (
+      <form onSubmit={handleSecondStepSubmit} className="flex flex-col gap-4">
+        {submissionState.error && (
+          <div className="bg-red-50 text-red-800 p-3 rounded-lg">
+            <p>{submissionState.error}</p>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between gap-2 bg-green-100 text-green-800 p-3 rounded-lg">
+          <div className="flex items-center gap-2">
+            <Upload size={20} />
+            <span className="font-semibold">Want to get your quote faster? Upload a picture of your door</span>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {/* Image upload section */}
+          <div className="space-y-2">
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageChange}
+              className="hidden"
+              id="door-images"
+              disabled={imagePreview.length >= MAX_FILES}
+            />
+            <label
+              htmlFor="door-images"
+              className={`cursor-pointer flex items-center justify-center gap-2 p-4 border-2 border-dashed rounded-lg ${
+                imagePreview.length >= MAX_FILES ? 'opacity-50 cursor-not-allowed' : 'hover:border-blue-500'
+              }`}
+            >
+              <Upload size={20} />
+              <span>Click to upload images (optional)</span>
+            </label>
+            <p className="text-sm text-gray-500">
+              Upload up to {MAX_FILES} images, 10MB max each
+            </p>
+          </div>
+
+          {/* Image previews */}
+          {imagePreview.length > 0 && (
+            <div className="grid grid-cols-3 gap-4">
+              {imagePreview.map((preview, index) => (
+                <div key={preview.preview} className="relative">
+                  <img
+                    src={preview.preview}
+                    alt={`Preview ${index + 1}`}
+                    className="w-full h-32 object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Comments section */}
+          <div>
+            <textarea
+              name="comments"
+              placeholder="Additional comments (optional)"
+              rows={4}
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              value={secondStepData.comments}
+              onChange={handleCommentChange}
+            />
+          </div>
+        </div>
+
+        <button 
+          type="submit"
+          disabled={submissionState.isSubmitting}
+          className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 ${
+            submissionState.isSubmitting ? 'opacity-75 cursor-not-allowed' : ''
+          }`}
+        >
+          {submissionState.isSubmitting ? 'Sending...' : 'Submit Additional Information'}
+          <ArrowRight size={20} />
+        </button>
+      </form>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">

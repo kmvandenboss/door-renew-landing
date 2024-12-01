@@ -16,7 +16,10 @@ type Lead = {
     utmCampaign: string | null;
     userAgent: string | null;
     ipAddress: string | null;
-  }
+    imageUrls: string[];
+    comments: string | null;
+    secondStepAt: Date | null;
+}
 
 const prisma = new PrismaClient();
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -83,6 +86,9 @@ export default async function handler(
         utmCampaign,
         userAgent,
         ipAddress: ip.toString(),
+        imageUrls: [],          // Initialize empty array
+        comments: null,         // Initialize as null
+        secondStepAt: null      // Initialize as null
       },
     });
 

@@ -17,6 +17,11 @@ model Lead {
   doorIssue String
   location  String?
   
+  // New fields for second step
+  comments        String?
+  imageUrls       String[]  // Array of image URLs
+  secondStepAt    DateTime? // Timestamp for when images/comments were added
+  
   // UTM Parameters
   utmSource    String?
   utmMedium    String?

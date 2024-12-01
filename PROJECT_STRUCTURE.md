@@ -16,6 +16,10 @@
 ### `/components`
 Contains reusable React components
 - `LandingPage.tsx` - Main landing page component
+- `/landing` - Landing page specific components
+  - `/QuoteForm` - Quote form component directory
+    - `index.tsx` - Quote form component implementation
+    - `types.ts` - TypeScript types for quote form
 
 ### `/pages`
 Next.js pages directory (file-based routing)
@@ -40,6 +44,11 @@ Static assets directory
 - `window.svg` - Window icon
 - `/images`
   - `door-renew-before-after-hero-sample.jpg` - Hero image for before/after comparison
+  - `door-renew-before-after-2.jpg` - Additional before/after comparison
+  - `door-renew-before-after-3.jpg` - Additional before/after comparison
+  - `door-renew-before-after-4.jpg` - Additional before/after comparison
+  - `door-renew-before-after-5.jpg` - Additional before/after comparison
+  - `door-renew-before-after-6.jpg` - Additional before/after comparison
 
 ### `/styles`
 Styling files
