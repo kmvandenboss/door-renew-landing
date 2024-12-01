@@ -1,23 +1,24 @@
 // /config/locations.ts
 
 export interface LocationConfig {
-    slug: string;            // URL-friendly name (e.g., 'detroit')
-    name: string;           // Display name (e.g., 'Detroit')
-    state: string;          // State abbreviation (e.g., 'MI')
-    serviceArea: string[];  // List of areas served
+    slug: string;
+    name: string;
+    state: string;
+    phoneNumber: string;  
+    serviceArea: string[];
     meta: {
-      title: string;       // SEO title
-      description: string; // SEO description
+      title: string;
+      description: string;
     };
     content: {
-      heroHeading?: string;    // Optional custom hero heading
-      serviceAreas?: string;   // Description of service areas
-      testimonials?: {         // Location-specific testimonials
+      heroHeading?: string;
+      serviceAreas?: string;
+      testimonials?: {
         quote: string;
         author: string;
         location: string;
       }[];
-      pricing?: {              // Location-specific pricing
+      pricing?: {
         average: number;
         starting: number;
       };
@@ -29,6 +30,7 @@ export interface LocationConfig {
       slug: 'detroit',
       name: 'Detroit',
       state: 'MI',
+      phoneNumber: '3132174052',  // Add this line
       serviceArea: ['Royal Oak', 'Troy', 'Birmingham', 'Bloomfield Hills'],
       meta: {
         title: 'Door Renew Detroit - Professional Door Refinishing',
@@ -54,6 +56,7 @@ export interface LocationConfig {
       slug: 'chicago',
       name: 'Chicago',
       state: 'IL',
+      phoneNumber: '3132174052',
       serviceArea: ['Oak Park', 'Evanston', 'Naperville', 'Schaumburg'],
       meta: {
         title: 'Door Renew Chicago - Professional Door Refinishing',
@@ -79,6 +82,7 @@ export interface LocationConfig {
         slug: 'orlando',
         name: 'Orlando',
         state: 'FL',
+        phoneNumber: '4074621545',
         serviceArea: ['Orlando', 'Ocala', 'Daytona', 'Longwood', 'Dr. Phillips', 'Maitland', 'Winter Park', 'Altamonte Springs', 'Oviedo', 'Kissimmee', 'Winter Garden', 'Windermere', 'Lake Nona'],
         meta: {
           title: 'Door Renew Orlando - Professional Door Refinishing',

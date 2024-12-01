@@ -15,6 +15,7 @@ import {
 import Image from 'next/image';
 import { LocationConfig } from '@/config/locations';
 import QuoteForm from '@/components/landing/QuoteForm';
+import EnhancedBanner from './EnhancedBanner';
 
 interface Benefit {
   title: string;
@@ -135,9 +136,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
   return (
     <div className="min-h-screen bg-white">
       {/* Top Banner */}
-      <div className="bg-blue-50 px-4 py-3 text-center text-sm md:text-base font-medium text-blue-800">
-        {isLocationSpecific ? `${location}'s` : "America's"} Trusted Door Restoration Experts
-      </div>
+      <EnhancedBanner 
+  isLocationSpecific={isLocationSpecific} 
+  location={location}
+  phoneNumber={locationData?.phoneNumber}
+/>
 
       {/* Hero Section - 40vh on mobile */}
       <div className="bg-white px-4 py-8 md:py-16 min-h-[40vh] md:min-h-0 flex items-center">
