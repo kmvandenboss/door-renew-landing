@@ -6,7 +6,7 @@ import { Resend } from 'resend';
 const prisma = new PrismaClient();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Email configuration - reusing from submit-lead.ts
+// Email configuration
 const MASTER_EMAIL = 'kevin@vandenboss.com';
 const LOCATION_EMAILS: { [key: string]: string } = {
   detroit: 'jim@vandenboss.com',
@@ -43,7 +43,7 @@ export default async function handler(
       return res.status(404).json({ error: 'Lead not found' });
     }
 
-    // Update the lead with new information
+    // Update the lead with new information and verify success
     const updatedLead = await prisma.lead.update({
       where: {
         id: lead.id
@@ -55,22 +55,27 @@ export default async function handler(
       }
     });
 
-    // Create email content
+    // Verify the update was successful
+    if (!updatedLead) {
+      throw new Error('Failed to update lead');
+    }
+
+    // Create email content using the updated lead data
     const emailContent = `
     Additional Information Submitted for Lead
     
-    Name: ${lead.firstName}
-    Phone: ${lead.phone}
-    Email: ${lead.email}
-    Door Issue: ${lead.doorIssue}
-    Location: ${lead.location || 'Not specified'}
+    Name: ${updatedLead.firstName}
+    Phone: ${updatedLead.phone}
+    Email: ${updatedLead.email}
+    Door Issue: ${updatedLead.doorIssue}
+    Location: ${updatedLead.location || 'Not specified'}
     
-    Comments: ${comments || 'No comments provided'}
+    Comments: ${updatedLead.comments || 'No comments provided'}
     
-    Images: ${imageUrls && imageUrls.length > 0 ? '\n' + imageUrls.join('\n') : 'No images uploaded'}
+    Images: ${updatedLead.imageUrls && updatedLead.imageUrls.length > 0 ? '\n' + updatedLead.imageUrls.join('\n') : 'No images uploaded'}
     
-    Original Submission: ${lead.createdAt}
-    Updated: ${new Date().toISOString()}
+    Original Submission: ${updatedLead.createdAt}
+    Updated: ${updatedLead.secondStepAt?.toISOString() || new Date().toISOString()}
     `;
 
     // Send to master email
@@ -82,18 +87,24 @@ export default async function handler(
     });
 
     // Send to location-specific email if applicable
-    if (lead.location && LOCATION_EMAILS[lead.location]) {
+    if (updatedLead.location && LOCATION_EMAILS[updatedLead.location]) {
       await resend.emails.send({
         from: 'Door Renew Leads <notifications@marketvibe.app>',
-        to: LOCATION_EMAILS[lead.location],
+        to: LOCATION_EMAILS[updatedLead.location],
         subject: 'Additional Information - Door Renew Lead',
         text: emailContent,
       });
     }
 
-    res.status(200).json({ success: true });
+    res.status(200).json({ 
+      success: true,
+      message: 'Lead updated successfully and notifications sent'
+    });
   } catch (error) {
     console.error('Error updating lead:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown error occurred'
+    });
   }
 }

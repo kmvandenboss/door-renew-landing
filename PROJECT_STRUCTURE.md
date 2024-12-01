@@ -30,6 +30,9 @@ Next.js pages directory (file-based routing)
 - `/api`
   - `hello.ts` - Example API route
   - `submit-lead.ts` - API endpoint for lead submission
+  - `update-lead.ts` - API endpoint for updating lead information
+  - `upload-images.ts` - API endpoint for image uploads
+  - `test-blob.ts` - API endpoint for blob storage testing
 - `/fonts`
   - `GeistMonoVF.woff` - Geist Mono variable font
   - `GeistVF.woff` - Geist variable font
@@ -61,6 +64,10 @@ Configuration directory
 ### `/prisma`
 Database configuration and schema
 - `schema.prisma` - Prisma database schema definition
+
+### `/utils`
+Utility functions and helpers
+- `upload.ts` - Utility functions for handling file uploads
 
 ## Project Overview
 This is a Next.js project with TypeScript integration, using Tailwind CSS for styling and Prisma for database management. The project follows a standard Next.js file structure with pages-based routing and component-based architecture. It includes custom fonts (Geist), various SVG assets, and image resources for the door renovation landing page.

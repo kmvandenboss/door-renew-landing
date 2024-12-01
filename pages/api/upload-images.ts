@@ -25,7 +25,7 @@ export default async function handler(
       maxFileSize: 10 * 1024 * 1024, // 10MB
     });
 
-    const [fields, files] = await form.parse(req);
+    const [_, files] = await form.parse(req); // Using underscore to indicate intentionally unused variable
     const uploadedFiles = Array.isArray(files.images) ? files.images : [];
 
     if (uploadedFiles.length === 0) {

@@ -190,13 +190,13 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
         URL.revokeObjectURL(preview.preview);
       });
     };
-  }, []);
+  }, [imagePreview]);
 
   if (submissionState.secondStepSubmitted) {
     return (
       <div className="bg-green-50 text-green-800 p-6 rounded-lg text-center">
         <h3 className="font-semibold text-lg mb-2">Thank you!</h3>
-        <p>We've received your additional information and will be in touch shortly.</p>
+        <p>We&apos;ve received your additional information and will be in touch shortly.</p>
       </div>
     );
   }
