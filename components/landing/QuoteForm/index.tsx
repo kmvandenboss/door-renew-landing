@@ -417,6 +417,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
           <option value="detroit">Detroit</option>
           <option value="chicago">Chicago</option>
           <option value="orlando">Orlando</option>
+          <option value="providence">Rhode Island</option>
         </select>
       )}
     

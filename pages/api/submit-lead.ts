@@ -31,6 +31,7 @@ const LOCATION_EMAILS: { [key: string]: string } = {
   detroit: 'jim@vandenboss.com',
   chicago: 'chicago@example.com',
   orlando: 'trevor.templin@doorrenew.com',
+  providence: 'kyle.sperduti@doorrenew.com'
 };
 
 // Basic rate limiting

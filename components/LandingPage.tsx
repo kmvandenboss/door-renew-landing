@@ -13,7 +13,7 @@ import {
   Wrench
 } from 'lucide-react';
 import Image from 'next/image';
-import { LocationConfig } from '@/config/locations';
+import { LocationConfig, sharedTestimonials } from '@/config/locations';
 import QuoteForm from '@/components/landing/QuoteForm';
 import EnhancedBanner from './EnhancedBanner';
 import Link from 'next/link';
@@ -122,23 +122,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     }
   ];
 
-  const socialProof: Review[] = locationData?.content?.testimonials || [
-    {
-      quote: "Our 20-year-old front door looks brand new! Saved thousands compared to replacement.",
-      author: "Sarah M.",
-      location: "Verified Customer"
-    },
-    {
-      quote: "Professional, on-time, and amazing results. Best home improvement decision we made.",
-      author: "Michael R.",
-      location: "Verified Customer"
-    },
-    {
-      quote: "Transformed our weather-beaten door in just one day. Incredible service!",
-      author: "Jennifer K.",
-      location: "Verified Customer"
-    }
-  ];
+  const socialProof: Review[] = sharedTestimonials;
 
   const nextReview = () => {
     setCurrentReviewIndex((prevIndex) => 
