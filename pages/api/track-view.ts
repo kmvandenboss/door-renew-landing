@@ -14,12 +14,26 @@ export default async function handler(
   try {
     const { location, url } = req.body;
     
+    // Debug logging
+    console.log('Tracking page view:', {
+      location,
+      url,
+      pixelId: process.env.META_PIXEL_ID,
+      hasAccessToken: !!process.env.META_ACCESS_TOKEN
+    });
+    
     // Get IP and user agent
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
     const userAgent = req.headers['user-agent'];
 
+    // Debug logging
+    console.log('Request details:', {
+      ip,
+      userAgent
+    });
+
     // Send event to Meta
-    await sendMetaEvent({
+    const result = await sendMetaEvent({
       event_name: 'ViewContent',
       event_time: Math.floor(Date.now() / 1000),
       event_source_url: url,
@@ -33,9 +47,17 @@ export default async function handler(
       }
     });
 
+    // Debug logging
+    console.log('Meta API response:', result);
+
     res.status(200).json({ success: true });
   } catch (error) {
+    // Debug logging
     console.error('Error tracking view:', error);
-    res.status(500).json({ error: 'Failed to track view' });
+    
+    res.status(500).json({ 
+      error: 'Failed to track view',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
 }
