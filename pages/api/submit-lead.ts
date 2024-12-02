@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 import { Resend } from 'resend';
+import { sendMetaEvent } from '../../utils/meta-api';
 
 type Lead = {
     id: string;
@@ -9,7 +10,7 @@ type Lead = {
     phone: string;
     email: string;
     doorIssue: string;
-    location: string | null;  // Changed from string | undefined to string | null
+    location: string | null;
     createdAt: Date;
     utmSource: string | null;
     utmMedium: string | null;
@@ -48,6 +49,7 @@ export default async function handler(
   try {
     // Get IP for rate limiting
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const userAgent = req.headers['user-agent'];
     
     // Basic rate limiting
     if (await isRateLimited(ip.toString())) {
@@ -71,7 +73,6 @@ export default async function handler(
     const utmSource = req.query.utm_source as string;
     const utmMedium = req.query.utm_medium as string;
     const utmCampaign = req.query.utm_campaign as string;
-    const userAgent = req.headers['user-agent'];
 
     // Save to database
     const lead = await prisma.lead.create({
@@ -86,11 +87,31 @@ export default async function handler(
         utmCampaign,
         userAgent,
         ipAddress: ip.toString(),
-        imageUrls: [],          // Initialize empty array
-        comments: null,         // Initialize as null
-        secondStepAt: null      // Initialize as null
+        imageUrls: [],
+        comments: null,
+        secondStepAt: null
       },
     });
+
+    // Send event to Meta
+    const metaResponse = await sendMetaEvent({
+      event_name: 'Lead',
+      event_time: Math.floor(Date.now() / 1000),
+      event_source_url: req.headers.referer || '',
+      action_source: 'website',
+      user_data: {
+        client_ip_address: typeof ip === 'string' ? ip : ip[0],
+        client_user_agent: userAgent || undefined,
+      },
+      custom_data: {
+        location,
+        doorIssue,
+        value: 100, // You can adjust this value based on your lead value estimation
+        currency: 'USD'
+      }
+    });
+
+    console.log('Meta API response for lead:', metaResponse);
 
     // Send emails
     await sendEmails(lead);
