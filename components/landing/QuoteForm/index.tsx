@@ -57,7 +57,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
   useEffect(() => {
     if (!hasStartedForm) return;
 
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+    const handleBeforeUnload = () => {
       if (!submissionState.success) {
         trackEvent('FormAbandon', location);
       }
