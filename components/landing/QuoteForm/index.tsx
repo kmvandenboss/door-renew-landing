@@ -1,7 +1,27 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Shield, ArrowRight, Upload, X } from 'lucide-react';
 import { QuoteFormProps, LeadFormData, SubmissionState, SecondStepData, ImagePreview } from './types';
 import { MAX_FILES } from '@/utils/upload';
+
+// Add tracking function
+async function trackEvent(eventName: string, location?: string, additionalData = {}) {
+  try {
+    await fetch('/api/track-event', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        eventName,
+        location,
+        url: window.location.href,
+        ...additionalData
+      }),
+    });
+  } catch (error) {
+    console.error('Error tracking event:', error);
+  }
+}
 
 const QuoteForm: React.FC<QuoteFormProps> = ({ 
   isLocationSpecific = false, 
@@ -31,6 +51,22 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
     secondStepSubmitted: false
   });
 
+  const [hasStartedForm, setHasStartedForm] = useState(false);
+
+  // Track form abandonment
+  useEffect(() => {
+    if (!hasStartedForm) return;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!submissionState.success) {
+        trackEvent('FormAbandon', location);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasStartedForm, submissionState.success, location]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmissionState(prev => ({ ...prev, isSubmitting: true, error: null }));
@@ -53,6 +89,11 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
         throw new Error(data?.error || 'Failed to submit form');
       }
   
+      // Track successful submission
+      await trackEvent('FormSubmit', location, {
+        doorIssue: formState.doorIssue
+      });
+
       setSubmissionState(prev => ({ 
         ...prev, 
         success: true, 
@@ -133,6 +174,13 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    
+    // Track first interaction with form
+    if (!hasStartedForm) {
+      setHasStartedForm(true);
+      trackEvent('FormStart', location);
+    }
+
     setFormState(prev => ({
       ...prev,
       [name]: value
