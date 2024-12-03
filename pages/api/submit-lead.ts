@@ -2,7 +2,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 import { Resend } from 'resend';
-import { sendMetaEvent } from '../../utils/meta-api';
+import { sendMetaEvent, MetaEvent } from '../../utils/meta-api';
+import { debugEvent, debugMetaResponse } from '@/utils/debug-events';
+
 
 type Lead = {
     id: string;
@@ -94,25 +96,42 @@ export default async function handler(
       },
     });
 
-    // Send event to Meta
-    const metaResponse = await sendMetaEvent({
+    // Generate a unique event ID for deduplication
+    const eventId = `lead_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    // Create the event data
+    const eventData: MetaEvent = {
       event_name: 'Lead',
       event_time: Math.floor(Date.now() / 1000),
       event_source_url: req.headers.referer || '',
-      action_source: 'website',
+      action_source: 'website' as const, // Fixed the action_source type
+      event_id: eventId,
       user_data: {
         client_ip_address: typeof ip === 'string' ? ip : ip[0],
         client_user_agent: userAgent || undefined,
+        em: email ? [email] : undefined,
+        ph: phone ? [phone] : undefined,
       },
       custom_data: {
         location,
         doorIssue,
-        value: 100, // You can adjust this value based on your lead value estimation
-        currency: 'USD'
+        value: 100,
+        currency: 'USD',
+        event_id: eventId
       }
-    });
+    };
 
-    console.log('Meta API response for lead:', metaResponse);
+    // Debug logging before sending event
+    debugEvent('Lead', eventData);
+
+    // Send event to Meta
+    const metaResponse = await sendMetaEvent(eventData);
+
+    // Debug logging for Meta API response
+    debugMetaResponse(metaResponse);
+
+    // Additional debug logging
+    console.log('Meta API complete response:', JSON.stringify(metaResponse, null, 2));
 
     // Send emails
     await sendEmails(lead);

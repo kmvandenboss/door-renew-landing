@@ -4,10 +4,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { sendMetaEvent } from '../../utils/meta-api';
 
 const EVENT_NAME_MAP: { [key: string]: string } = {
-  FormStart: 'InitiateCheckout',
-  FormSubmit: 'Lead',
-  FormAbandon: 'FormAbandon',
-  CallButtonClick: 'Contact'
+  FormStart: 'FormStart',          // Changed from InitiateCheckout
+  FormSubmit: 'Lead',             // Keep this as Lead
+  FormAbandon: 'FormAbandon',     // Keep as separate event
+  CallButtonClick: 'Lead'         // Keep this as Lead
 };
 
 export default async function handler(
@@ -21,33 +21,38 @@ export default async function handler(
   try {
     const { eventName, location, url, ...additionalData } = req.body;
     
-    // Debug logging
-    console.log('Tracking event:', {
-      eventName,
-      location,
-      url,
-      additionalData
-    });
-    
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
-    const userAgent = req.headers['user-agent'];
+    // Only proceed with Meta API call if it's a Lead event
+    if (EVENT_NAME_MAP[eventName] === 'Lead') {
+      const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+      const userAgent = req.headers['user-agent'];
 
-    const result = await sendMetaEvent({
-      event_name: EVENT_NAME_MAP[eventName] || eventName,
-      event_time: Math.floor(Date.now() / 1000),
-      event_source_url: url,
-      action_source: 'website',
-      user_data: {
-        client_ip_address: typeof ip === 'string' ? ip : ip[0],
-        client_user_agent: userAgent || undefined,
-      },
-      custom_data: {
+      const result = await sendMetaEvent({
+        event_name: EVENT_NAME_MAP[eventName],
+        event_time: Math.floor(Date.now() / 1000),
+        event_source_url: url,
+        action_source: 'website',
+        user_data: {
+          client_ip_address: typeof ip === 'string' ? ip : ip[0],
+          client_user_agent: userAgent || undefined,
+        },
+        custom_data: {
+          location,
+          leadSource: eventName === 'CallButtonClick' ? 'phone' : 'form',
+          ...additionalData
+        }
+      });
+
+      console.log('Meta API response for event:', result);
+    } else {
+      // For non-lead events, just log them without sending to Meta
+      console.log('Non-lead event tracked:', {
+        eventName,
+        mappedName: EVENT_NAME_MAP[eventName],
         location,
-        ...additionalData
-      }
-    });
-
-    console.log('Meta API response for event:', result);
+        url,
+        additionalData
+      });
+    }
 
     res.status(200).json({ success: true });
   } catch (error) {
