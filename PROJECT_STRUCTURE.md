@@ -28,6 +28,7 @@ Next.js pages directory (file-based routing)
 - `_document.tsx` - Custom Document component for page structure
 - `[location].tsx` - Dynamic route page for location-specific content
 - `index.tsx` - Homepage
+- `privacy-policy.tsx` - Privacy policy page
 - `/api`
   - `hello.ts` - Example API route
   - `submit-lead.ts` - API endpoint for lead submission
@@ -35,6 +36,7 @@ Next.js pages directory (file-based routing)
   - `upload-images.ts` - API endpoint for image uploads
   - `test-blob.ts` - API endpoint for blob storage testing
   - `track-view.ts` - API endpoint for tracking page views
+  - `track-events.ts` - API endpoint for tracking user events
 - `/fonts`
   - `GeistMonoVF.woff` - Geist Mono variable font
   - `GeistVF.woff` - Geist variable font
@@ -48,6 +50,7 @@ Static assets directory
 - `vercel.svg` - Vercel logo
 - `window.svg` - Window icon
 - `/images`
+  - `door-renew-logo.png` - Door Renew logo
   - `door-renew-before-after-hero-sample.jpg` - Hero image for before/after comparison
   - `door-renew-before-after-2.jpg` - Additional before/after comparison
   - `door-renew-before-after-3.jpg` - Additional before/after comparison
@@ -71,6 +74,7 @@ Database configuration and schema
 Utility functions and helpers
 - `upload.ts` - Utility functions for handling file uploads
 - `meta-api.ts` - Utility functions for API metadata handling
+- `analytics.ts` - Utility functions for analytics and tracking
 
 ## Project Overview
 This is a Next.js project with TypeScript integration, using Tailwind CSS for styling and Prisma for database management. The project follows a standard Next.js file structure with pages-based routing and component-based architecture. It includes custom fonts (Geist), various SVG assets, and image resources for the door renovation landing page.

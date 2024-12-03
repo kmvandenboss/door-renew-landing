@@ -470,6 +470,16 @@ const LandingPage: React.FC<LandingPageProps> = ({
   bg-white shadow-lg rounded-t-xl z-40
   max-h-[90vh] overflow-y-auto
 `}>
+  {/* Add close button */}
+  <div className="flex justify-end p-2">
+    <button
+      onClick={() => setIsFormVisible(false)}
+      className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+      aria-label="Close form"
+    >
+      <X className="w-6 h-6 text-gray-500" />
+    </button>
+  </div>
   <div className="p-4">
     <QuoteForm 
       isLocationSpecific={isLocationSpecific} 
