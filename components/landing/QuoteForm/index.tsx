@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Shield, ArrowRight, Upload, X } from 'lucide-react';
 import { QuoteFormProps, LeadFormData, SubmissionState, SecondStepData, ImagePreview } from './types';
 import { MAX_FILES } from '@/utils/upload';
+import { trackFormSubmission, trackSecondStepSubmission } from '@/utils/analytics';
 
 // Add tracking function
 async function trackEvent(eventName: string, location?: string, additionalData = {}) {
@@ -69,6 +70,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    trackFormSubmission();
     setSubmissionState(prev => ({ ...prev, isSubmitting: true, error: null }));
   
     try {
@@ -112,6 +114,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 
   const handleSecondStepSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    trackSecondStepSubmission(secondStepData.images.length > 0);
     setSubmissionState(prev => ({ ...prev, isSubmitting: true, error: null }));
   
     try {

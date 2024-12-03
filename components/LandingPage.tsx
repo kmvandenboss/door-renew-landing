@@ -17,6 +17,7 @@ import { LocationConfig, sharedTestimonials } from '@/config/locations';
 import QuoteForm from '@/components/landing/QuoteForm';
 import EnhancedBanner from './EnhancedBanner';
 import Link from 'next/link';
+import { trackTimeOnPage } from '@/utils/analytics';
 
 interface Benefit {
   title: string;
@@ -85,6 +86,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    trackTimeOnPage();
+  }, []);
 
   const benefits: Benefit[] = [
     {

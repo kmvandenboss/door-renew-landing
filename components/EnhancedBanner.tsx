@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Phone, Star, Check } from 'lucide-react';
+import { trackCallButtonClick } from '@/utils/analytics';
 
 // Removed location from CallButtonProps since it's not used
 interface CallButtonProps {
@@ -32,6 +33,7 @@ const CallButton: React.FC<CallButtonProps> = ({ phoneNumber, onCallClick }) => 
   };
 
   const handleClick = () => {
+    trackCallButtonClick();
     onCallClick();
     if (!isMobile) {
       setIsNumberVisible(true);
