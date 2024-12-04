@@ -1,7 +1,7 @@
 // pages/api/track-view.ts
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { sendMetaEvent, MetaEvent } from '../../utils/meta-api';
+import { sendMetaEvent } from '../../utils/meta-api';
 
 export default async function handler(
   req: NextApiRequest,
