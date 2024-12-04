@@ -1,7 +1,7 @@
 // pages/api/track-view.ts
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { sendMetaEvent } from '../../utils/meta-api';
+import { sendMetaEvent, MetaEvent } from '../../utils/meta-api';
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,14 +12,15 @@ export default async function handler(
   }
 
   try {
-    const { location, url } = req.body;
+    const { location, url, fbc } = req.body;
     
     // Debug logging
     console.log('Tracking page view:', {
       location,
       url,
       pixelId: process.env.META_PIXEL_ID,
-      hasAccessToken: !!process.env.META_ACCESS_TOKEN
+      hasAccessToken: !!process.env.META_ACCESS_TOKEN,
+      fbc
     });
     
     // Get IP and user agent
@@ -41,6 +42,7 @@ export default async function handler(
       user_data: {
         client_ip_address: typeof ip === 'string' ? ip : ip[0],
         client_user_agent: userAgent || undefined,
+        fbc: fbc
       },
       custom_data: {
         location: location,

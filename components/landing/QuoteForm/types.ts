@@ -30,3 +30,34 @@ export interface ImagePreview {
   file: File;
   preview: string;
 }
+
+export interface TrackingData {
+  location?: string;
+  url?: string;
+  fbc?: string;
+}
+
+export interface MetaUserData {
+  client_ip_address?: string;
+  client_user_agent?: string;
+  em?: string[];
+  ph?: string[];
+  fbc?: string;
+  fbp?: string;
+}
+
+export interface MetaEvent {
+  event_name: string;
+  event_time: number;
+  event_source_url?: string;
+  action_source: 'website';
+  user_data: MetaUserData;
+  custom_data?: {
+    location?: string;
+    value?: number;
+    currency?: string;
+    doorIssue?: string;
+    event_id?: string;
+  };
+  event_id?: string;
+}

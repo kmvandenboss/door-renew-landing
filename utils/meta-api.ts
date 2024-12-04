@@ -1,5 +1,7 @@
 // utils/meta-api.ts
 
+import { getStoredClickId } from './click-tracking';
+
 export interface MetaEvent {
   event_name: string;
   event_time: number;
@@ -73,10 +75,10 @@ export async function sendMetaEvent(event: MetaEvent) {
     // Hash any PII data in user_data
     const userData = {
       ...event.user_data,
-      em: event.user_data.em?.map(email => hashData(email)),
-      ph: event.user_data.ph?.map(phone => hashData(phone)),
+      em: event.user_data.em?.map((email: string) => hashData(email)),
+      ph: event.user_data.ph?.map((phone: string) => hashData(phone)),
       fbp: getFbp(),
-      fbc: getFbc(),
+      fbc: event.user_data.fbc || getStoredClickId() || undefined,
     };
 
     const payload = {
