@@ -3,11 +3,22 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { sendMetaEvent } from '../../utils/meta-api';
 
-const EVENT_NAME_MAP: { [key: string]: string } = {
-  FormStart: 'FormStart',          // Changed from InitiateCheckout
-  FormSubmit: 'Lead',             // Keep this as Lead
-  FormAbandon: 'FormAbandon',     // Keep as separate event
-  CallButtonClick: 'Lead'         // Keep this as Lead
+type StandardMetaEvent = 'Lead' | 'ViewContent' | 'InitiateCheckout' | 'Contact';
+
+const STANDARD_META_EVENTS: Record<StandardMetaEvent, boolean> = {
+  'Lead': true,
+  'ViewContent': true,
+  'InitiateCheckout': true,
+  'Contact': true
+};
+
+type CustomEventName = 'formStart' | 'formSubmission' | 'callButtonClick' | 'pageView';
+
+const EVENT_NAME_MAP: Record<CustomEventName, StandardMetaEvent> = {
+  formStart: 'InitiateCheckout',
+  formSubmission: 'Lead',
+  callButtonClick: 'Lead',
+  pageView: 'ViewContent'
 };
 
 export default async function handler(
@@ -20,14 +31,15 @@ export default async function handler(
 
   try {
     const { eventName, location, url, ...additionalData } = req.body;
+    const metaEventName = EVENT_NAME_MAP[eventName as CustomEventName];
     
-    // Only proceed with Meta API call if it's a Lead event
-    if (EVENT_NAME_MAP[eventName] === 'Lead') {
+    // Only send events that are standard Meta events
+    if (metaEventName && STANDARD_META_EVENTS[metaEventName]) {
       const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
       const userAgent = req.headers['user-agent'];
 
       const result = await sendMetaEvent({
-        event_name: EVENT_NAME_MAP[eventName],
+        event_name: metaEventName,
         event_time: Math.floor(Date.now() / 1000),
         event_source_url: url,
         action_source: 'website',
@@ -37,21 +49,13 @@ export default async function handler(
         },
         custom_data: {
           location,
-          leadSource: eventName === 'CallButtonClick' ? 'phone' : 'form',
           ...additionalData
         }
       });
 
       console.log('Meta API response for event:', result);
     } else {
-      // For non-lead events, just log them without sending to Meta
-      console.log('Non-lead event tracked:', {
-        eventName,
-        mappedName: EVENT_NAME_MAP[eventName],
-        location,
-        url,
-        additionalData
-      });
+      console.log('Skipping non-standard Meta event:', eventName);
     }
 
     res.status(200).json({ success: true });
