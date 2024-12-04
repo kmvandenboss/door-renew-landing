@@ -29,11 +29,6 @@ interface Review {
   location: string;
 }
 
-interface Process {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-}
 
 interface LandingPageProps {
   isLocationSpecific?: boolean;
