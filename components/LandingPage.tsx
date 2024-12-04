@@ -2,15 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { 
   Star, 
   Check, 
-  ArrowRight, 
-  Shield, 
+  ArrowRight,  
   X, 
   ChevronLeft, 
   ChevronRight,
   DollarSign,
   Clock,
   Award,
-  Wrench
 } from 'lucide-react';
 import Image from 'next/image';
 import { LocationConfig, sharedTestimonials } from '@/config/locations';
@@ -105,24 +103,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
       title: "Premium Quality Guaranteed",
       description: "Expert craftsmen, marine-grade finishes, and an industry-leading 2-year warranty",
       icon: <Award className="w-8 h-8 text-blue-600" />
-    }
-  ];
-
-  const process: Process[] = [
-    {
-      title: "Expert Assessment",
-      description: "Our craftsman visits your home, examines your door, and provides a detailed quote. We'll discuss finish options and answer any questions about the process.",
-      icon: <Shield className="w-8 h-8 text-blue-600" />
-    },
-    {
-      title: "Careful Restoration",
-      description: "We carefully remove your door and install a secure temporary barrier. At our workshop, skilled artisans strip away years of wear, repair any damage, and apply premium finishes that protect against the elements.",
-      icon: <Wrench className="w-8 h-8 text-blue-600" />
-    },
-    {
-      title: "Perfect Installation",
-      description: "Your beautifully restored door returns home, expertly installed and ready to make a lasting impression. We don't leave until you're completely satisfied with every detail.",
-      icon: <Check className="w-8 h-8 text-blue-600" />
     }
   ];
 
@@ -286,26 +266,75 @@ const LandingPage: React.FC<LandingPageProps> = ({
       )}
 
       {/* Process Section */}
-      <div className="px-4 py-12 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
-            Your Door&apos;s Journey to Renewed Beauty
-          </h2>
-          <div className="space-y-8">
-            {process.map((step, index) => (
-              <div key={index} className="flex gap-4">
-                <div className="flex-shrink-0 mt-1">
-                  {step.icon}
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                  <p className="text-gray-600">{step.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+<div className="px-4 py-12 bg-gray-50">
+  <div className="max-w-4xl mx-auto">
+    <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
+      Your Door&apos;s Journey to Renewed Beauty
+    </h2>
+    <div className="space-y-8">
+      {/* Expert Assessment */}
+      <div className="md:flex md:items-start md:gap-8">
+        <div className="md:w-1/3">
+          <Image
+            src="/images/van.jpg"
+            alt="Door Renew Service Van"
+            width={400}
+            height={400}
+            className="w-full rounded-lg shadow-md mb-4 md:mb-0"
+          />
+        </div>
+        <div className="md:w-2/3">
+          <h3 className="text-xl font-semibold mb-2">Expert Assessment</h3>
+          <p className="text-gray-600">
+            Our craftsman visits your home, examines your door, and provides a detailed quote. 
+            We'll discuss finish options and answer any questions about the process.
+          </p>
         </div>
       </div>
+
+      {/* Careful Restoration */}
+      <div className="md:flex md:items-start md:gap-8 md:flex-row-reverse">
+        <div className="md:w-1/3">
+          <Image
+            src="/images/shop.jpg"
+            alt="Professional Door Restoration Workshop"
+            width={400}
+            height={400}
+            className="w-full rounded-lg shadow-md mb-4 md:mb-0"
+          />
+        </div>
+        <div className="md:w-2/3">
+          <h3 className="text-xl font-semibold mb-2">Careful Restoration</h3>
+          <p className="text-gray-600">
+            We carefully remove your door and install a secure temporary barrier. At our workshop, 
+            skilled artisans strip away years of wear, repair any damage, and apply premium 
+            finishes that protect against the elements.
+          </p>
+        </div>
+      </div>
+
+      {/* Perfect Installation */}
+      <div className="md:flex md:items-start md:gap-8">
+        <div className="md:w-1/3">
+          <Image
+            src="/images/installed.jpg"
+            alt="Perfectly Installed Refinished Door"
+            width={400}
+            height={400}
+            className="w-full rounded-lg shadow-md mb-4 md:mb-0"
+          />
+        </div>
+        <div className="md:w-2/3">
+          <h3 className="text-xl font-semibold mb-2">Perfect Installation</h3>
+          <p className="text-gray-600">
+            Your beautifully restored door returns home, expertly installed and ready to make 
+            a lasting impression. We don't leave until you're completely satisfied with every detail.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* Safety Features */}
       <div className="px-4 py-12 bg-white">
