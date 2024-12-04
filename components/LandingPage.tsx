@@ -287,7 +287,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
           <h3 className="text-xl font-semibold mb-2">Expert Assessment</h3>
           <p className="text-gray-600">
             Our craftsman visits your home, examines your door, and provides a detailed quote. 
-            We'll discuss finish options and answer any questions about the process.
+            We&apos;ll discuss finish options and answer any questions about the process.
           </p>
         </div>
       </div>
@@ -328,7 +328,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
           <h3 className="text-xl font-semibold mb-2">Perfect Installation</h3>
           <p className="text-gray-600">
             Your beautifully restored door returns home, expertly installed and ready to make 
-            a lasting impression. We don't leave until you're completely satisfied with every detail.
+            a lasting impression. We don&apos;t leave until you&apos;re completely satisfied with every detail.
           </p>
         </div>
       </div>
