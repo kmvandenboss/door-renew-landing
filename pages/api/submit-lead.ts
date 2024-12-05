@@ -69,8 +69,8 @@ async function sendEmails(lead: Lead) {
     
     Name: ${lead.firstName}
     Phone: ${lead.phone}
-    Email: ${lead.email}
-    Door Issue: ${lead.doorIssue}
+    ${lead.email ? `Email: ${lead.email}` : ''}
+    ${lead.doorIssue ? `Door Issue: ${lead.doorIssue}` : ''}
     Location: ${lead.location || 'Not specified'}
     
     Lead Source: ${lead.utmSource || 'Direct'}
@@ -125,9 +125,9 @@ export default async function handler(
       location,
     } = req.body;
 
-    // Basic validation
-    if (!firstName || !phone || !email || !doorIssue) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    // Updated validation - only firstName and phone required
+    if (!firstName || !phone) {
+      return res.status(400).json({ error: 'First name and phone number are required' });
     }
 
     // Get UTM parameters and other tracking data
@@ -135,13 +135,13 @@ export default async function handler(
     const utmMedium = req.query.utm_medium as string;
     const utmCampaign = req.query.utm_campaign as string;
 
-    // Save to database
+    // Save to database with optional fields
     const lead = await prisma.lead.create({
       data: {
         firstName,
         phone,
-        email,
-        doorIssue,
+        email: email || null,
+        doorIssue: doorIssue || null,
         location,
         utmSource,
         utmMedium,
@@ -155,7 +155,7 @@ export default async function handler(
     });
 
     // Generate deterministic event ID for deduplication
-    const eventId = `lead_${Date.now()}_${hashData(email + phone)}`;
+    const eventId = `lead_${Date.now()}_${hashData(phone)}`;
 
     // Create the Meta event data
     const eventData: MetaEvent = {
@@ -172,7 +172,7 @@ export default async function handler(
       },
       custom_data: {
         location,
-        doorIssue,
+        doorIssue: doorIssue || undefined,
         value: 100,
         currency: 'USD',
         event_id: eventId

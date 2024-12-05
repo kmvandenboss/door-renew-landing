@@ -13,8 +13,8 @@ model Lead {
   
   firstName String
   phone     String
-  email     String
-  doorIssue String
+  email     String?    // Made optional
+  doorIssue String?    // Made optional
   location  String?
   
   // New fields for second step

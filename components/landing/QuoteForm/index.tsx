@@ -3,6 +3,7 @@ import { Shield, ArrowRight, Upload, X } from 'lucide-react';
 import { QuoteFormProps, LeadFormData, SubmissionState, SecondStepData, ImagePreview } from './types';
 import { MAX_FILES } from '@/utils/upload';
 import { trackFormSubmission, trackSecondStepSubmission, trackEvent } from '@/utils/analytics';
+import { getStoredClickId } from '@/utils/click-tracking';
 
 const QuoteForm: React.FC<QuoteFormProps> = ({ 
   isLocationSpecific = false, 
@@ -149,7 +150,8 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
             location: isLocationSpecific ? location?.toLowerCase() : formState.location,
             utmSource,
             utmMedium,
-            utmCampaign
+            utmCampaign,
+            fbc: getStoredClickId()
           }),
         });
   
