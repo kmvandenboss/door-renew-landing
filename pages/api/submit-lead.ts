@@ -7,21 +7,21 @@ import { debugEvent, debugMetaResponse } from '@/utils/debug-events';
 import crypto from 'crypto';
 
 type Lead = {
-    id: string;
-    firstName: string;
-    phone: string;
-    email: string;
-    doorIssue: string;
-    location: string | null;
-    createdAt: Date;
-    utmSource: string | null;
-    utmMedium: string | null;
-    utmCampaign: string | null;
-    userAgent: string | null;
-    ipAddress: string | null;
-    imageUrls: string[];
-    comments: string | null;
-    secondStepAt: Date | null;
+  id: string;
+  firstName: string;
+  phone: string;
+  email: string | null;       // Updated to allow null
+  doorIssue: string | null;   // Updated to allow null
+  location: string | null;
+  createdAt: Date;
+  utmSource: string | null;
+  utmMedium: string | null;
+  utmCampaign: string | null;
+  userAgent: string | null;
+  ipAddress: string | null;
+  imageUrls: string[];
+  comments: string | null;
+  secondStepAt: Date | null;
 }
 
 const prisma = new PrismaClient();
