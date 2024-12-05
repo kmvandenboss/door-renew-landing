@@ -251,7 +251,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
     return (
       <div className="bg-green-50 text-green-800 p-6 rounded-lg text-center">
         <h3 className="font-semibold text-lg mb-2">Thank you!</h3>
-        <p>We've received your additional information and will be in touch shortly.</p>
+        <p>We&apos;ve received your additional information and will be in touch shortly.</p>
       </div>
     );
   }
@@ -266,7 +266,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
       
       {submissionState.success && (
         <div className="bg-green-50 text-green-800 p-3 rounded-lg">
-          <p>Thank you! We'll be in touch shortly.</p>
+          <p>Thank you! We&apos;ll be in touch shortly.</p>
         </div>
       )}
 
@@ -348,7 +348,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
             value={formState.doorIssue}
             onChange={handleInputChange}
           >
-            <option value="">What's Wrong With Your Door?</option>
+            <option value="">What&apos;s Wrong With Your Door?</option>
             <option value="weathered">Weathered/Faded</option>
             <option value="damaged">Damaged/Dented</option>
             <option value="peeling">Peeling Paint/Stain</option>
