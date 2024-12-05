@@ -52,11 +52,20 @@ Static assets directory
 - `/images`
   - `door-renew-logo.png` - Door Renew logo
   - `door-renew-before-after-hero-sample.jpg` - Hero image for before/after comparison
-  - `door-renew-before-after-2.jpg` - Additional before/after comparison
-  - `door-renew-before-after-3.jpg` - Additional before/after comparison
-  - `door-renew-before-after-4.jpg` - Additional before/after comparison
-  - `door-renew-before-after-5.jpg` - Additional before/after comparison
-  - `door-renew-before-after-6.jpg` - Additional before/after comparison
+  - `door-renew-before-after-hero.jpg` - Updated hero image for before/after comparison
+  - `door-renew-before-after-2.jpg` - Before/after comparison image
+  - `door-renew-before-after-3.jpg` - Before/after comparison image
+  - `door-renew-before-after-4.jpg` - Before/after comparison image
+  - `door-renew-before-after-5.jpg` - Before/after comparison image
+  - `door-renew-before-after-6.jpg` - Before/after comparison image
+  - `door-renew-before-after-21.jpg` - Additional before/after comparison image
+  - `installed.jpg` - Installation process image
+  - `shop.jpg` - Workshop/shop image
+  - `van.jpg` - Service van image
+  - `/restore` - Restoration process images
+    - `installed.jpg` - Installation process image
+    - `shop.jpg` - Workshop/shop image
+    - `van.jpg` - Service van image
 
 ### `/styles`
 Styling files
@@ -75,6 +84,9 @@ Utility functions and helpers
 - `upload.ts` - Utility functions for handling file uploads
 - `meta-api.ts` - Utility functions for API metadata handling
 - `analytics.ts` - Utility functions for analytics and tracking
+- `click-tracking.ts` - Utility functions for tracking user clicks
+- `debug-events.ts` - Utility functions for debugging events
+- `ebug-events.ts` - Duplicate debug events file (likely a typo)
 
 ## Project Overview
 This is a Next.js project with TypeScript integration, using Tailwind CSS for styling and Prisma for database management. The project follows a standard Next.js file structure with pages-based routing and component-based architecture. It includes custom fonts (Geist), various SVG assets, and image resources for the door renovation landing page.

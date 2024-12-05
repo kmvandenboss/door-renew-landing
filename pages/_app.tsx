@@ -10,3 +10,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return <Component {...pageProps} />;
 }
+
+if (process.env.NODE_ENV === 'development') {
+  window.fbq('init', process.env.NEXT_PUBLIC_META_PIXEL_ID, { debug: true });
+}

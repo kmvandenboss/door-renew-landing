@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Phone, Star, Check } from 'lucide-react';
 import { trackCallButtonClick } from '@/utils/analytics';
+import { sendMetaEvent } from '@/utils/meta-api';
+import { hashData } from '@/utils/meta-api';
 
 // Removed location from CallButtonProps since it's not used
 interface CallButtonProps {
@@ -82,13 +84,40 @@ const EnhancedBanner: React.FC<EnhancedBannerProps> = ({
   // Only show call button if we have both location and phone number
   const showCallButton = isLocationSpecific && phoneNumber;
 
-  const handleCallClick = () => {
+  const handleCallClick = async () => {
+    // Generate a deterministic event ID
+    const eventId = `call_${Date.now()}_${hashData(phoneNumber || '')}`;
+
+    // Send Meta event
+    await sendMetaEvent({
+      event_name: 'Lead',
+      event_time: Math.floor(Date.now() / 1000),
+      event_source_url: window.location.href,
+      action_source: 'website',
+      event_id: eventId,
+      user_data: {
+        client_ip_address: undefined,
+        client_user_agent: window.navigator.userAgent,
+      },
+      custom_data: {
+        location,
+        value: 100,
+        currency: 'USD',
+        event_id: eventId,
+        lead_type: 'phone_call'
+      }
+    });
+
+    // Keep existing Google Analytics tracking
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'call_button_click', {
         'event_category': 'lead_conversion',
         'event_label': location || 'general'
       });
     }
+
+    // Also call the existing analytics function
+    trackCallButtonClick();
   };
 
   return (

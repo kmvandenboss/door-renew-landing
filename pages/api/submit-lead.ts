@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { Resend } from 'resend';
 import { sendMetaEvent, MetaEvent } from '../../utils/meta-api';
 import { debugEvent, debugMetaResponse } from '@/utils/debug-events';
-
+import crypto from 'crypto';
 
 type Lead = {
     id: string;
@@ -41,6 +41,64 @@ const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 const RATE_LIMIT_MAX = 3; // Max 3 submissions per minute
 const rateLimitMap = new Map<string, number[]>();
 
+// Helper function to hash data for Meta
+function hashData(data: string): string {
+  return crypto.createHash('sha256').update(data.toLowerCase().trim()).digest('hex');
+}
+
+async function isRateLimited(ip: string): Promise<boolean> {
+  const now = Date.now();
+  const submissions = rateLimitMap.get(ip) || [];
+  
+  // Remove old submissions
+  const recentSubmissions = submissions.filter(
+    time => now - time < RATE_LIMIT_WINDOW
+  );
+  
+  if (recentSubmissions.length >= RATE_LIMIT_MAX) {
+    return true;
+  }
+  
+  rateLimitMap.set(ip, [...recentSubmissions, now]);
+  return false;
+}
+
+async function sendEmails(lead: Lead) {
+  const emailContent = `
+    New Lead from Door Renew Website
+    
+    Name: ${lead.firstName}
+    Phone: ${lead.phone}
+    Email: ${lead.email}
+    Door Issue: ${lead.doorIssue}
+    Location: ${lead.location || 'Not specified'}
+    
+    Lead Source: ${lead.utmSource || 'Direct'}
+    Campaign: ${lead.utmCampaign || 'None'}
+    Medium: ${lead.utmMedium || 'None'}
+    
+    Submitted at: ${lead.createdAt}
+  `;
+
+  // Send to master email
+  await resend.emails.send({
+    from: 'Door Renew Leads<notifications@marketvibe.app>',
+    to: MASTER_EMAIL,
+    subject: 'New Door Renew Lead',
+    text: emailContent,
+  });
+
+  // Send to location-specific email if applicable
+  if (lead.location && LOCATION_EMAILS[lead.location]) {
+    await resend.emails.send({
+      from: 'Door Renew Leads <notifications@marketvibe.app>',
+      to: LOCATION_EMAILS[lead.location],
+      subject: 'New Door Renew Lead',
+      text: emailContent,
+    });
+  }
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -50,7 +108,7 @@ export default async function handler(
   }
 
   try {
-    // Get IP for rate limiting
+    // Get IP for rate limiting and Meta API
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
     const userAgent = req.headers['user-agent'];
     
@@ -96,15 +154,15 @@ export default async function handler(
       },
     });
 
-    // Generate a unique event ID for deduplication
-    const eventId = `lead_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Generate deterministic event ID for deduplication
+    const eventId = `lead_${Date.now()}_${hashData(email + phone)}`;
 
-    // Create the event data
+    // Create the Meta event data
     const eventData: MetaEvent = {
       event_name: 'Lead',
       event_time: Math.floor(Date.now() / 1000),
       event_source_url: req.headers.referer || '',
-      action_source: 'website' as const, // Fixed the action_source type
+      action_source: 'website',
       event_id: eventId,
       user_data: {
         client_ip_address: typeof ip === 'string' ? ip : ip[0],
@@ -121,74 +179,51 @@ export default async function handler(
       }
     };
 
+    // Add UTM parameters if they exist
+    if (utmSource || utmMedium || utmCampaign) {
+      eventData.custom_data = {
+        ...eventData.custom_data,
+        ...(utmSource && { utm_source: utmSource }),
+        ...(utmMedium && { utm_medium: utmMedium }),
+        ...(utmCampaign && { utm_campaign: utmCampaign })
+      };
+    }
+
     // Debug logging before sending event
-    debugEvent('Lead', eventData);
+    if (process.env.NODE_ENV === 'development') {
+      debugEvent('Lead', eventData);
+    }
 
     // Send event to Meta
     const metaResponse = await sendMetaEvent(eventData);
 
-    // Debug logging for Meta API response
-    debugMetaResponse(metaResponse);
+    // Debug logging for Meta API response in development
+    if (process.env.NODE_ENV === 'development') {
+      debugMetaResponse(metaResponse);
+      console.log('Meta API complete response:', JSON.stringify(metaResponse, null, 2));
+    }
 
-    // Additional debug logging
-    console.log('Meta API complete response:', JSON.stringify(metaResponse, null, 2));
-
-    // Send emails
+    // Send notification emails
     await sendEmails(lead);
 
-    res.status(200).json({ success: true });
+    // Return success response
+    res.status(200).json({ 
+      success: true,
+      leadId: lead.id,
+      eventId: eventId
+    });
+
   } catch (error) {
     console.error('Error processing lead:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-}
-
-async function isRateLimited(ip: string): Promise<boolean> {
-  const now = Date.now();
-  const submissions = rateLimitMap.get(ip) || [];
-  
-  // Remove old submissions
-  const recentSubmissions = submissions.filter(
-    time => now - time < RATE_LIMIT_WINDOW
-  );
-  
-  if (recentSubmissions.length >= RATE_LIMIT_MAX) {
-    return true;
-  }
-  
-  rateLimitMap.set(ip, [...recentSubmissions, now]);
-  return false;
-}
-
-async function sendEmails(lead: Lead) {
-  // Create email content
-  const emailContent = `
-    New Lead from Door Renew Website
     
-    Name: ${lead.firstName}
-    Phone: ${lead.phone}
-    Email: ${lead.email}
-    Door Issue: ${lead.doorIssue}
-    Location: ${lead.location || 'Not specified'}
-    
-    Submitted at: ${lead.createdAt}
-  `;
-
-  // Send to master email
-  await resend.emails.send({
-    from: 'Door Renew Leads<notifications@marketvibe.app>',
-    to: MASTER_EMAIL,
-    subject: 'New Door Renew Lead',
-    text: emailContent,
-  });
-
-  // Send to location-specific email if applicable
-  if (lead.location && LOCATION_EMAILS[lead.location]) {
-    await resend.emails.send({
-      from: 'Door Renew Leads <notifications@marketvibe.app>',
-      to: LOCATION_EMAILS[lead.location],
-      subject: 'New Door Renew Lead',
-      text: emailContent,
-    });
+    // Send appropriate error response
+    if (error instanceof Error) {
+      res.status(500).json({ 
+        error: 'Internal server error', 
+        message: process.env.NODE_ENV === 'development' ? error.message : 'An error occurred while processing your request'
+      });
+    } else {
+      res.status(500).json({ error: 'Internal server error' });
+    }
   }
 }
