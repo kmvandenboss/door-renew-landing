@@ -117,51 +117,76 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Logo Header */}
+      <div className="flex items-center justify-center md:justify-between px-6 py-4 bg-white border-b">
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/images/door-renew-logo.png"
+            alt="Door Renew Logo"
+            width={120}
+            height={60}
+            className="h-auto w-auto md:w-[150px]"
+            priority
+          />
+        </Link>
+      </div>
 
-<div className="flex items-center justify-center md:justify-between px-6 py-4 bg-white border-b">
-  <Link href="/" className="flex items-center">
-    <Image
-      src="/images/door-renew-logo.png"
-      alt="Door Renew Logo"
-      width={120} // Made slightly smaller by default
-      height={60}
-      className="h-auto w-auto md:w-[150px]" // Larger on desktop
-      priority
-    />
-  </Link>
-</div>
-      {/* Top Banner */}
-      <EnhancedBanner 
-  isLocationSpecific={isLocationSpecific} 
-  location={location}
-  phoneNumber={locationData?.phoneNumber}
-/>
-
-      {/* Hero Section - 40vh on mobile */}
-      <div className="bg-white px-4 py-8 md:py-16 min-h-[40vh] md:min-h-0 flex items-center">
-        <div className="max-w-4xl mx-auto">
+    {/* Hero Section */}
+    <div className="relative">
+      {/* Hero Text - Above image on mobile, beside on desktop */}
+      <div className="bg-white px-4 py-8 md:py-16">
+      <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight text-gray-900">
-            Transform Your Front Door&apos;s Beauty Without The Cost Of Replacement
+          Enhance Your Home&apos;s Curb Appeal with Expert Door Refinishing
           </h1>
-          
           <p className="text-xl md:text-2xl mb-6 text-gray-600">
-            Save thousands while restoring your door to its original elegance. Our craftsmen bring new life to worn, weathered doors at a fraction of replacement cost.
+          Restore your door to its original elegance at a fraction of replacement cost.
           </p>
         </div>
       </div>
 
-      {/* Hero Image */}
-      <div className="w-full bg-gray-50 px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <Image
-            src="/images/door-renew-before-after-hero-sample.jpg"
-            alt="Door Refinishing Before and After Transformation"
-            width={1920}
-            height={1081}
-            className="w-full object-cover rounded-lg shadow-lg"
-          />
+      {/* Hero Image Container - Removed pt-8, kept pb-8 */}
+      <div className="w-full bg-gray-50 px-4 pb-8">
+        <div className="max-w-4xl mx-auto relative">
+          <div className="aspect-[16/9] md:aspect-[21/9] relative">
+            <Image
+              src="/images/door-renew-before-after-hero-sample.jpg"
+              alt="Door Refinishing Before and After Transformation"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
         </div>
       </div>
+
+      {/* Enhanced Banner - Below hero */}
+      <div className="relative z-10">
+        <EnhancedBanner 
+          isLocationSpecific={isLocationSpecific} 
+          location={location}
+          phoneNumber={locationData?.phoneNumber}
+        />
+      </div>
+    </div>
+
+    {/* Mobile Form - After banner */}
+    <div className="md:hidden px-4 py-8 bg-white">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+            Start Your Door Renewal Journey
+          </h2>
+          <p className="text-lg text-gray-600">
+            Request a Quick Quote Now!
+          </p>
+        </div>
+        <QuoteForm 
+          isLocationSpecific={isLocationSpecific} 
+          location={location} 
+        />
+      </div>
+    </div>
 
       {/* Why Replace Section */}
       <div className="px-4 py-12 bg-white">
@@ -204,7 +229,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
-                src: '/images/door-renew-before-after-2.jpg',
+                src: '/images/door-renew-before-after-21.jpg',
                 alt: 'Door Transformation - Classic Wood Restoration'
               },
               {
@@ -261,14 +286,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
       )}
 
       {/* Process Section */}
-<div className="px-4 py-12 bg-gray-50">
-  <div className="max-w-4xl mx-auto">
+<div className="bg-gray-50">
+  <div className="max-w-4xl mx-auto px-4 py-12">
     <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
       Your Door&apos;s Journey to Renewed Beauty
     </h2>
     <div className="space-y-8">
       {/* Expert Assessment */}
-      <div className="md:flex md:items-start md:gap-8">
+      <div className="bg-gray-50 p-6 rounded-lg md:flex md:items-start md:gap-8">
         <div className="md:w-1/3">
           <Image
             src="/images/van.jpg"
@@ -282,13 +307,13 @@ const LandingPage: React.FC<LandingPageProps> = ({
           <h3 className="text-xl font-semibold mb-2">Expert Assessment</h3>
           <p className="text-gray-600">
             Our craftsman visits your home, examines your door, and provides a detailed quote. 
-            We&apos;ll discuss finish options and answer any questions about the process.
+            We'll discuss finish options and answer any questions about the process.
           </p>
         </div>
       </div>
 
       {/* Careful Restoration */}
-      <div className="md:flex md:items-start md:gap-8 md:flex-row-reverse">
+      <div className="bg-white p-6 rounded-lg md:flex md:items-start md:gap-8 md:flex-row-reverse">
         <div className="md:w-1/3">
           <Image
             src="/images/shop.jpg"
@@ -309,7 +334,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </div>
 
       {/* Perfect Installation */}
-      <div className="md:flex md:items-start md:gap-8">
+      <div className="bg-gray-50 p-6 rounded-lg md:flex md:items-start md:gap-8">
         <div className="md:w-1/3">
           <Image
             src="/images/installed.jpg"
@@ -323,7 +348,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
           <h3 className="text-xl font-semibold mb-2">Perfect Installation</h3>
           <p className="text-gray-600">
             Your beautifully restored door returns home, expertly installed and ready to make 
-            a lasting impression. We don&apos;t leave until you&apos;re completely satisfied with every detail.
+            a lasting impression. We don't leave until you're completely satisfied with every detail.
           </p>
         </div>
       </div>
