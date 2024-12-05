@@ -34,11 +34,18 @@ const CallButton: React.FC<CallButtonProps> = ({ phoneNumber, onCallClick }) => 
     return number.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
   };
 
-  const handleClick = () => {
-    trackCallButtonClick();
-    onCallClick();
-    if (!isMobile) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent default button behavior
+    
+    if (isMobile) {
+      // For mobile, proceed with click tracking and calling
+      trackCallButtonClick();
+      onCallClick();
+    } else if (!isNumberVisible) {
+      // For desktop, first show the number if it's not visible
       setIsNumberVisible(true);
+      trackCallButtonClick();
+      onCallClick();
     }
   };
 
@@ -59,6 +66,7 @@ const CallButton: React.FC<CallButtonProps> = ({ phoneNumber, onCallClick }) => 
           className={`inline-flex items-center gap-2 bg-white hover:bg-blue-50 text-blue-800 px-6 py-2 rounded-full transition-colors text-xl font-semibold ${
             isNumberVisible ? 'cursor-default hover:bg-white' : ''
           }`}
+          type="button"
         >
           <Phone className="w-6 h-6" />
           <span>
