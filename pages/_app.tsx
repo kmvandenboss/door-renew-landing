@@ -5,11 +5,26 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { storeClickId } from '@/utils/click-tracking';
 
-// Extend Window interface to include dataLayer, keeping existing gtag definition
+// Define proper types for dataLayer
+interface DataLayerEvent {
+  event: string;
+  page?: string;
+  page_title?: string;
+  page_location?: string;
+  timestamp?: string;
+  previous_page?: string;
+  user_agent?: string;
+  language?: string;
+  viewport_size?: string;
+  'gtm.start'?: number;
+  debug_mode?: boolean;
+}
+
+// Extend Window interface with proper typing
 declare global {
   interface Window {
-    dataLayer: any[];
-    fbq: any;
+    dataLayer: DataLayerEvent[];
+    fbq: (track: string, event: string, params?: Record<string, unknown>) => void;
   }
 }
 
@@ -21,7 +36,7 @@ export default function App({ Component, pageProps }: AppProps) {
     
     // Add debug initialization for Meta
     if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
-      window.fbq('init', process.env.NEXT_PUBLIC_META_PIXEL_ID, { debug: true });
+      window.fbq('init', process.env.NEXT_PUBLIC_META_PIXEL_ID || '', { debug: true });
     }
 
     // Initialize dataLayer
