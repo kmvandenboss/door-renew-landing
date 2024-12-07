@@ -5,6 +5,20 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
+        {/* Google Analytics 4 */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=G-DG8N4M6EFR`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-DG8N4M6EFR');
+          `}
+        </Script>
+
         {/* Google Tag Manager */}
         <Script id="gtm" strategy="afterInteractive">
           {`
@@ -16,7 +30,7 @@ export default function Document() {
           `}
         </Script>
 
-        {/* Meta Pixel Code */}
+        {/* Meta Pixel Code - keeping your existing Meta pixel code */}
         <Script id="fb-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
