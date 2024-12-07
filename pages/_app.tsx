@@ -7,8 +7,8 @@ import { storeClickId } from '@/utils/click-tracking';
 
 declare global {
   interface Window {
-    dataLayer: any[];
-    fbq: any;
+    dataLayer: Array<Record<string, unknown>>;
+    fbq: (track: string, event: string, params?: Record<string, unknown>) => void;
   }
 }
 
@@ -19,7 +19,7 @@ export default function App({ Component, pageProps }: AppProps) {
     storeClickId();
     
     // Add debug initialization for Meta
-    if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
+    if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined' && process.env.NEXT_PUBLIC_META_PIXEL_ID) {
       window.fbq('init', process.env.NEXT_PUBLIC_META_PIXEL_ID, { debug: true });
     }
 

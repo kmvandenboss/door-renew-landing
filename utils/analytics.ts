@@ -2,8 +2,8 @@
 
 declare global {
   interface Window {
-    dataLayer: any[];
-    fbq: any;
+    dataLayer: Array<Record<string, unknown>>;
+    fbq: (track: string, event: string, params?: Record<string, unknown>) => void;
   }
 }
 
