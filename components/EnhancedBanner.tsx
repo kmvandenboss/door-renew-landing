@@ -53,7 +53,7 @@ const CallButton: React.FC<CallButtonProps> = ({ phoneNumber, onCallClick }) => 
     <div className="flex justify-center">
       {isMobile ? (
         <a
-          href={`tel:+1${phoneNumber.replace(/\D/g, '')}`}
+        href={`tel:${phoneNumber.replace(/\D/g, '')}`}
           onClick={handleClick}
           className="inline-flex items-center gap-2 bg-white hover:bg-blue-50 text-blue-800 px-6 py-2 rounded-full transition-colors text-xl font-semibold"
         >
