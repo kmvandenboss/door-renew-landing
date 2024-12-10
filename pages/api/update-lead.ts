@@ -1,4 +1,3 @@
-// pages/api/update-lead.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 import { Resend } from 'resend';
@@ -24,44 +23,44 @@ export default async function handler(
   }
 
   try {
-    const { email, imageUrls, comments } = req.body;
+    const { leadId, email, imageUrls, comments, doorIssue } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ error: 'Email is required to match the lead' });
+    console.log('Received update request for leadId:', leadId); // Debug logging
+
+    if (!leadId) {
+      console.log('No leadId provided in request'); // Debug logging
+      return res.status(400).json({ error: 'Lead ID is required' });
     }
 
-    // Find the existing lead
-    const lead = await prisma.lead.findFirst({
+    // Find the lead using leadId
+    const lead = await prisma.lead.findUnique({
       where: {
-        email: email
-      },
-      orderBy: {
-        createdAt: 'desc'
+        id: leadId
       }
     });
 
     if (!lead) {
+      console.log('Lead not found with ID:', leadId); // Debug logging
       return res.status(404).json({ error: 'Lead not found' });
     }
 
-    // Update the lead with new information and verify success
+    console.log('Found lead:', lead); // Debug logging
+
+    // Update the lead with new information
     const updatedLead = await prisma.lead.update({
       where: {
-        id: lead.id
+        id: leadId
       },
       data: {
+        email: email || null,
+        doorIssue: doorIssue || null,
         imageUrls: imageUrls || [],
         comments: comments || '',
         secondStepAt: new Date()
       }
     });
 
-    // Verify the update was successful
-    if (!updatedLead) {
-      throw new Error('Failed to update lead');
-    }
-
-    // Create email content using the updated lead data
+    // Create email content
     const emailContent = `
     Additional Information Submitted for Lead
     
@@ -96,6 +95,8 @@ export default async function handler(
         text: emailContent,
       });
     }
+
+    console.log('Successfully updated lead and sent notifications'); // Debug logging
 
     res.status(200).json({ 
       success: true,
