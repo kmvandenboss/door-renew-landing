@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Phone, Star, Check } from 'lucide-react';
 import { trackCallButtonClick } from '@/utils/analytics';
 import { sendMetaEvent } from '@/utils/meta-api';
@@ -20,7 +20,7 @@ const CallButton: React.FC<CallButtonProps> = ({ phoneNumber, onCallClick }) => 
   const [isNumberVisible, setIsNumberVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
@@ -35,17 +35,17 @@ const CallButton: React.FC<CallButtonProps> = ({ phoneNumber, onCallClick }) => 
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent default button behavior
-    
     if (isMobile) {
-      // For mobile, proceed with click tracking and calling
+      // Don't prevent default on mobile to allow the tel: link to work
       trackCallButtonClick();
       onCallClick();
-    } else if (!isNumberVisible) {
-      // For desktop, first show the number if it's not visible
-      setIsNumberVisible(true);
-      trackCallButtonClick();
-      onCallClick();
+    } else {
+      e.preventDefault();
+      if (!isNumberVisible) {
+        setIsNumberVisible(true);
+        trackCallButtonClick();
+        onCallClick();
+      }
     }
   };
 
@@ -53,7 +53,7 @@ const CallButton: React.FC<CallButtonProps> = ({ phoneNumber, onCallClick }) => 
     <div className="flex justify-center">
       {isMobile ? (
         <a
-        href={`tel:${phoneNumber.replace(/\D/g, '')}`} 
+          href={`tel:${phoneNumber.replace(/\D/g, '')}`}
           onClick={handleClick}
           className="inline-flex items-center gap-2 bg-white hover:bg-blue-50 text-blue-800 px-6 py-2 rounded-full transition-colors text-xl font-semibold"
         >
