@@ -9,6 +9,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
   isLocationSpecific = false, 
   location 
 }) => {
+  const [leadId, setLeadId] = useState<string | null>(null);
   const [formState, setFormState] = useState<LeadFormData>({
     firstName: '',
     phone: '',
@@ -160,6 +161,8 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
         if (!response.ok) {
           throw new Error(data?.error || 'Failed to submit form');
         }
+
+        setLeadId(data.leadId);
   
         setSubmissionState(prev => ({ 
           ...prev, 
@@ -177,11 +180,20 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
       }
     } else {
       // Second step submission
+      if (!leadId) {
+        setSubmissionState(prev => ({
+          ...prev,
+          error: 'Unable to update lead information. Please try again.',
+          isSubmitting: false
+        }));
+        return;
+      }
+      
       trackSecondStepSubmission(secondStepData.images.length > 0);
       setSubmissionState(prev => ({ ...prev, isSubmitting: true, error: null }));
-  
+      
       try {
-        let imageUrls: string[] = [];
+        let imageUrls: string[] = []
         
         // Upload images if any exist
         if (secondStepData.images.length > 0) {
@@ -211,6 +223,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            leadId,  // Add this line
             email: formState.email,
             doorIssue: formState.doorIssue,
             imageUrls,
@@ -268,7 +281,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
       
       {submissionState.success && (
         <div className="bg-green-50 text-green-800 p-3 rounded-lg">
-          <p>Thank you! We&apos;ll be in touch shortly.</p>
+          <p>Step 2: Project Details</p>
         </div>
       )}
 
