@@ -145,8 +145,16 @@ export default async function handler(
       query: req.query
     });
   
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-leadbridge-token');
+      return res.status(200).end();
+    }
+  
+    // Test endpoint accessibility
     if (req.method === 'GET') {
-      // Add simple GET response for testing
       console.log('GET request received');
       return res.status(200).json({ status: 'webhook endpoint active' });
     }
@@ -156,20 +164,24 @@ export default async function handler(
       return res.status(405).json({ error: 'Method not allowed' });
     }
   
+    // Prevent redirect
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+  
     try {
       // Log the raw body content
       console.log('Raw body content:', JSON.stringify(req.body, null, 2));
   
-      // Extract data from body, handling potential array format
+      // Extract data, handling potential PHP-style array format
       let leadData: LeadBridgeData;
-      if (Array.isArray(req.body)) {
-        console.log('Received array data:', req.body);
-        leadData = req.body[0];
-      } else if (req.body.body) {
-        console.log('Received nested body data:', req.body.body);
+      if (req.body.body) {
+        console.log('Found nested body data');
         leadData = req.body.body;
+      } else if (req.body.DATA) {
+        console.log('Found PHP-style array data');
+        leadData = req.body.DATA;
       } else {
-        console.log('Received direct data:', req.body);
+        console.log('Using direct body data');
         leadData = req.body;
       }
   
@@ -243,21 +255,22 @@ export default async function handler(
         location: formConfig?.location || null,
         leadType: formConfig?.leadType || null,
         formId: leadData.form_id,
-        processedPhone: phoneNumber
+        processedPhone: phoneNumber,
+        status: 200
       };
       console.log('Sending success response:', response);
-      return res.status(200).json(response);
-  
-    } catch (error) {
-      // Detailed error logging
-      console.error('Webhook error:', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
-      });
-      return res.status(500).json({
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
+      return res.status(200)
+      .setHeader('Location', req.url || '')
+      .json(response);
+
+  } catch (error) {
+    console.error('Webhook error:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    return res.status(500).json({
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
-  
+}
