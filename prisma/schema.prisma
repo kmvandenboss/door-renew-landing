@@ -30,4 +30,12 @@ model Lead {
   // Additional tracking
   userAgent    String?
   ipAddress    String?
+
+  // New fields for Facebook LeadBridge integration
+  leadType      String?    // For 'door' or 'cabinet'
+  formId        String?    // Facebook form ID
+  source        String?    // For tracking lead source (e.g., 'facebook_leadbridge')
+  campaignName  String?    // Facebook campaign name
+  adName        String?    // Facebook ad name
+  formName      String?    // Facebook form name
 }
