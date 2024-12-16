@@ -31,6 +31,7 @@ interface LeadBridgeData {
   utm_source?: string;
   utm_medium?: string;
   utm_campaign?: string;
+  secret?: string;
 }
 
 // Map Facebook form IDs to locations and lead types
@@ -135,30 +136,50 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  console.log('Webhook received request:', {
+    method: req.method,
+    headers: req.headers,
+    body: req.body,
+    query: req.query
+  });
+
   if (req.method !== 'POST') {
+    console.log('Invalid method:', req.method);
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Verify the LeadBridge secret token if configured
-  const authToken = req.headers['x-leadbridge-token'];
-  if (process.env.LEADBRIDGE_SECRET_TOKEN && authToken !== process.env.LEADBRIDGE_SECRET_TOKEN) {
-    console.error('Invalid LeadBridge token');
+  // Check for token in both headers and body
+  const headerToken = req.headers['x-leadbridge-token'];
+  const bodyToken = req.body.secret;
+  const configuredToken = process.env.LEADBRIDGE_SECRET_TOKEN;
+
+  console.log('Auth check:', {
+    hasHeaderToken: !!headerToken,
+    hasBodyToken: !!bodyToken,
+    hasConfiguredToken: !!configuredToken
+  });
+
+  if (configuredToken && headerToken !== configuredToken && bodyToken !== configuredToken) {
+    console.error('Invalid token provided');
     return res.status(403).json({ error: 'Invalid authentication token' });
   }
 
   try {
     const leadData: LeadBridgeData = req.body;
-    console.log('Received lead data:', leadData); // Debug logging
+    console.log('Processing lead data:', leadData);
 
     // Get form configuration
     const formConfig = getFormConfig(leadData);
-    console.log('Form config:', formConfig); // Debug logging
+    console.log('Form config determined:', formConfig);
+
+    // Clean phone number (remove '+' if present)
+    const phoneNumber = (leadData.phone_number || leadData.phone || '').replace(/^\+/, '');
 
     // Store lead in database with lead type
-    await prisma.lead.create({
+    const createdLead = await prisma.lead.create({
       data: {
         firstName: leadData.full_name || leadData.name || '',
-        phone: leadData.phone_number || leadData.phone || '',
+        phone: phoneNumber,
         email: leadData.email || null,
         location: formConfig?.location || null,
         leadType: formConfig?.leadType || null,
@@ -175,14 +196,19 @@ export default async function handler(
       },
     });
 
+    console.log('Lead created in database:', createdLead);
+
     // Send email notifications
     await sendEmailNotifications(leadData, formConfig);
+
+    console.log('Email notifications sent successfully');
 
     return res.status(200).json({ 
       success: true,
       location: formConfig?.location || null,
       leadType: formConfig?.leadType || null,
-      formId: leadData.form_id
+      formId: leadData.form_id,
+      processedPhone: phoneNumber
     });
   } catch (error) {
     console.error('Error processing webhook:', error);
