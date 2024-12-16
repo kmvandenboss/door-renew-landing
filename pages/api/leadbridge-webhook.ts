@@ -121,7 +121,7 @@ async function sendEmailNotifications(leadData: LeadBridgeData, formConfig: Form
     text: emailContent,
   });
 
-  // Send to location-specific email
+  // Send to location-specific email if applicable
   if (LOCATION_EMAILS[location]) {
     await resend.emails.send({
       from: 'Door Renew Leads <notifications@marketvibe.app>',
@@ -133,110 +133,139 @@ async function sendEmailNotifications(leadData: LeadBridgeData, formConfig: Form
 }
 
 export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse
-  ) {
-    // Enable CORS for LeadBridge
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  // Log raw request
+  console.log('Raw request received:', {
+    method: req.method,
+    url: req.url,
+    headers: req.headers,
+    body: req.body
+  });
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
-    console.log('Webhook request received:', {
-      method: req.method,
-      headers: req.headers,
-      body: req.body,
-      url: req.url
-    });
-  
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-      return res.status(200).end();
-    }
-  
-    // Test endpoint
-    if (req.method === 'GET') {
-      return res.status(200).json({ status: 'webhook endpoint active' });
-    }
-  
-    if (req.method !== 'POST') {
-      console.log('Invalid method:', req.method);
-      return res.status(405).json({ error: 'Method not allowed' });
-    }
-  
-    try {
-      // Log incoming data
-      console.log('Raw webhook data:', JSON.stringify(req.body, null, 2));
-  
-      // Extract data from the LeadBridge format
-      let leadData;
-      if (typeof req.body === 'string') {
-        try {
-          leadData = JSON.parse(req.body);
-        } catch (e) {
-          console.log('Failed to parse string body:', e);
-        }
-      } else if (req.body.body) {
-        leadData = req.body.body;
-      } else if (req.body.DATA) {
-        leadData = req.body.DATA;
-      } else {
-        leadData = req.body;
-      }
-  
-      console.log('Processed lead data:', leadData);
-  
-      // Verify token
-      const token = req.headers['x-leadbridge-token'] || leadData?.secret;
-      console.log('Token verification:', {
-        receivedToken: token,
-        matches: token === process.env.LEADBRIDGE_SECRET_TOKEN
-      });
-  
-      if (!token || token !== process.env.LEADBRIDGE_SECRET_TOKEN) {
-        console.log('Token verification failed');
-        return res.status(403).json({ error: 'Invalid token' });
-      }
-  
-      // Process the lead
-      const formConfig = FORM_CONFIG[leadData.form_id];
-      console.log('Form configuration:', formConfig);
-  
-      const phoneNumber = (leadData.phone_number || leadData.phone || '').replace(/^\+/, '');
-  
-      // Create lead in database
-      const lead = await prisma.lead.create({
-        data: {
-          firstName: leadData.full_name || leadData.name || '',
-          phone: phoneNumber,
-          email: leadData.email || null,
-          location: formConfig?.location || null,
-          leadType: formConfig?.leadType || null,
-          source: 'facebook_leadbridge',
-          campaignName: leadData.campaign_name || null,
-          formId: leadData.form_id || null,
-          formName: leadData.form_name || null,
-          imageUrls: [],
-          comments: null
-        },
-      });
-  
-      console.log('Lead created:', lead);
-  
-      // Send notification emails
-      await sendEmailNotifications(leadData, formConfig);
-      console.log('Notifications sent');
-  
-      return res.status(200).json({
-        success: true,
-        leadId: lead.id,
-        location: formConfig?.location
-      });
-  
-    } catch (error) {
-      console.error('Webhook error:', error);
-      return res.status(500).json({
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error occurred'
-      });
-    }
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-leadbridge-token');
+    return res.status(200).end();
   }
+
+  // Test endpoint accessibility
+  if (req.method === 'GET') {
+    console.log('GET request received');
+    return res.status(200).json({ status: 'webhook endpoint active' });
+  }
+
+  if (req.method !== 'POST') {
+    console.log('Invalid method:', req.method);
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    // Log the raw body content
+    console.log('Raw body content:', JSON.stringify(req.body, null, 2));
+
+    // Extract data, handling potential PHP-style array format
+    let leadData: LeadBridgeData;
+    if (req.body.body) {
+      console.log('Found nested body data');
+      leadData = req.body.body;
+    } else if (req.body.DATA) {
+      console.log('Found PHP-style array data');
+      leadData = req.body.DATA;
+    } else {
+      console.log('Using direct body data');
+      leadData = req.body;
+    }
+
+    // Log parsed lead data
+    console.log('Parsed lead data:', leadData);
+
+    // Check for token in various possible locations
+    const headerToken = req.headers['x-leadbridge-token'];
+    const bodyToken = leadData.secret || req.body.secret;
+    const configuredToken = process.env.LEADBRIDGE_SECRET_TOKEN;
+
+    console.log('Token check:', {
+      hasHeaderToken: !!headerToken,
+      hasBodyToken: !!bodyToken,
+      hasConfiguredToken: !!configuredToken,
+      tokenMatch: bodyToken === configuredToken || headerToken === configuredToken
+    });
+
+    if (configuredToken && headerToken !== configuredToken && bodyToken !== configuredToken) {
+      console.error('Token mismatch');
+      return res.status(403).json({ error: 'Invalid authentication token' });
+    }
+
+    // Get form configuration using the function
+    const formConfig = getFormConfig(leadData);
+    console.log('Form config:', formConfig);
+
+    // Clean phone number
+    const phoneNumber = (leadData.phone_number || leadData.phone || '').replace(/^\+/, '');
+    console.log('Processed phone number:', phoneNumber);
+
+    // Create lead in database
+    console.log('Attempting database creation with:', {
+      firstName: leadData.full_name || leadData.name || '',
+      phone: phoneNumber,
+      email: leadData.email || null,
+      location: formConfig?.location || null,
+      leadType: formConfig?.leadType || null
+    });
+
+    const createdLead = await prisma.lead.create({
+      data: {
+        firstName: leadData.full_name || leadData.name || '',
+        phone: phoneNumber,
+        email: leadData.email || null,
+        location: formConfig?.location || null,
+        leadType: formConfig?.leadType || null,
+        source: 'facebook_leadbridge',
+        utmSource: leadData.utm_source || null,
+        utmMedium: leadData.utm_medium || null,
+        utmCampaign: leadData.utm_campaign || null,
+        campaignName: leadData.campaign_name || null,
+        adName: leadData.ad_name || null,
+        formName: leadData.form_name || null,
+        formId: leadData.form_id || null,
+        imageUrls: [],
+        comments: null
+      },
+    });
+
+    console.log('Lead created:', createdLead);
+
+    // Send email notifications
+    console.log('Attempting to send email notifications');
+    await sendEmailNotifications(leadData, formConfig);
+    console.log('Email notifications sent');
+
+    // Return success response
+    const response = {
+      success: true,
+      location: formConfig?.location || null,
+      leadType: formConfig?.leadType || null,
+      formId: leadData.form_id,
+      processedPhone: phoneNumber,
+      status: 200
+    };
+    
+    console.log('Sending success response:', response);
+    return res.status(200).json(response);
+
+  } catch (error) {
+    console.error('Webhook error:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    
+    return res.status(500).json({
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+}
