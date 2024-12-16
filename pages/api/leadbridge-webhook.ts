@@ -17,6 +17,22 @@ interface FormConfig {
   leadType: 'door' | 'cabinet';
 }
 
+interface LeadBridgeData {
+  form_id?: string;
+  form_name?: string;
+  full_name?: string;
+  name?: string;
+  phone_number?: string;
+  phone?: string;
+  email?: string;
+  campaign_name?: string;
+  ad_name?: string;
+  platform?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+}
+
 // Map Facebook form IDs to locations and lead types
 const FORM_CONFIG: { [key: string]: FormConfig } = {
   // Orlando forms
@@ -27,7 +43,7 @@ const FORM_CONFIG: { [key: string]: FormConfig } = {
   '946695224044577': { location: 'providence', leadType: 'cabinet' }
 };
 
-function getFormConfig(leadData: any): FormConfig | null {
+function getFormConfig(leadData: LeadBridgeData): FormConfig | null {
   // Try to get config from form ID
   if (leadData.form_id && FORM_CONFIG[leadData.form_id]) {
     return FORM_CONFIG[leadData.form_id];
@@ -36,7 +52,7 @@ function getFormConfig(leadData: any): FormConfig | null {
   return null;
 }
 
-async function sendEmailNotifications(leadData: any, formConfig: FormConfig | null) {
+async function sendEmailNotifications(leadData: LeadBridgeData, formConfig: FormConfig | null) {
   if (!formConfig) {
     // If no form config found, still send to master email with a warning
     const errorContent = `
@@ -131,7 +147,7 @@ export default async function handler(
   }
 
   try {
-    const leadData = req.body;
+    const leadData: LeadBridgeData = req.body;
     console.log('Received lead data:', leadData); // Debug logging
 
     // Get form configuration
@@ -140,25 +156,24 @@ export default async function handler(
 
     // Store lead in database with lead type
     await prisma.lead.create({
-        data: {
-          firstName: leadData.full_name || leadData.name || '',
-          phone: leadData.phone_number || leadData.phone || '',
-          email: leadData.email || null,
-          location: formConfig?.location || null,
-          source: 'facebook_leadbridge',
-          utmSource: leadData.utm_source || null,
-          utmMedium: leadData.utm_medium || null,
-          utmCampaign: leadData.utm_campaign || null,
-          campaignName: leadData.campaign_name || null,
-          adName: leadData.ad_name || null,
-          formName: leadData.form_name || null,
-          formId: leadData.form_id || null,
-          leadType: formConfig?.leadType || null,
-          imageUrls: [],
-          comments: null,
-          doorIssue: null
-        },
-      });
+      data: {
+        firstName: leadData.full_name || leadData.name || '',
+        phone: leadData.phone_number || leadData.phone || '',
+        email: leadData.email || null,
+        location: formConfig?.location || null,
+        leadType: formConfig?.leadType || null,
+        source: 'facebook_leadbridge',
+        utmSource: leadData.utm_source || null,
+        utmMedium: leadData.utm_medium || null,
+        utmCampaign: leadData.utm_campaign || null,
+        campaignName: leadData.campaign_name || null,
+        adName: leadData.ad_name || null,
+        formName: leadData.form_name || null,
+        formId: leadData.form_id || null,
+        imageUrls: [],
+        comments: null
+      },
+    });
 
     // Send email notifications
     await sendEmailNotifications(leadData, formConfig);
