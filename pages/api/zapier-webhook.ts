@@ -49,7 +49,8 @@ const FORM_CONFIG: { [key: string]: FormConfig } = {
   '3844541842467999': { location: 'orlando', leadType: 'cabinet' },
   
   // Providence forms
-  '946695224044577': { location: 'providence', leadType: 'cabinet' }
+  '946695224044577': { location: 'providence', leadType: 'cabinet' },
+  '3059467917542329': { location: 'providence', leadType: 'door' },
 };
 
 function getFormConfig(formId: string): FormConfig | null {
