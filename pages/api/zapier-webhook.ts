@@ -11,7 +11,8 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const MASTER_EMAIL = 'kevin@vandenboss.com';
 const LOCATION_EMAILS: { [key: string]: string } = {
   orlando: 'trevor.templin@doorrenew.com',
-  providence: 'kyle.sperduti@doorrenew.com'
+  providence: 'kyle.sperduti@doorrenew.com',
+  detroit: 'detroit@doorrenew.com'
 };
 
 interface FormConfig {
@@ -51,6 +52,10 @@ const FORM_CONFIG: { [key: string]: FormConfig } = {
   // Providence forms
   '946695224044577': { location: 'providence', leadType: 'cabinet' },
   '3059467917542329': { location: 'providence', leadType: 'door' },
+
+  // Detroit forms
+  '1169932074781994': { location: 'detroit', leadType: 'door' },
+  '1130506105240869': { location: 'detroit', leadType: 'cabinet' },
 };
 
 function getFormConfig(formId: string): FormConfig | null {
