@@ -1,7 +1,7 @@
 // pages/api/zapier-webhook.ts
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { Resend } from 'resend';
 
 const prisma = new PrismaClient();
@@ -33,6 +33,8 @@ interface ZapierData {
   full_name?: string;
   email?: string;
   phone_number?: string;
+  condition?: string;            // Door condition multiple choice
+  zip_code?: string;            // Customer zip code
   
   // UTM Parameters
   utm_source?: string;
@@ -54,7 +56,7 @@ const FORM_CONFIG: { [key: string]: FormConfig } = {
   '3059467917542329': { location: 'providence', leadType: 'door' },
 
   // Detroit forms
-  '1169932074781994': { location: 'detroit', leadType: 'door' },
+  '1153303559668652': { location: 'detroit', leadType: 'door' },
   '1130506105240869': { location: 'detroit', leadType: 'cabinet' },
 };
 
@@ -109,6 +111,8 @@ async function sendEmailNotifications(leadData: ZapierData, formConfig: FormConf
     Name: ${leadData.full_name || 'Not provided'}
     Phone: ${leadData.phone_number || 'Not provided'}
     Email: ${leadData.email || 'Not provided'}
+    Zip Code: ${leadData.zip_code || 'Not provided'}
+    ${leadData.condition ? `Door Condition: ${leadData.condition}` : ''}
     
     Form Details:
     Form ID: ${leadData.id || 'Not specified'}
@@ -185,25 +189,30 @@ export default async function handler(
     // Clean phone number
     const phoneNumber = (leadData.phone_number || '').replace(/^\+/, '');
 
+    // Prepare lead data
+    const createData = {
+      firstName: leadData.full_name || '',
+      phone: phoneNumber,
+      email: leadData.email || null,
+      location: formConfig?.location || null,
+      leadType: formConfig?.leadType || null,
+      source: 'facebook_zapier',
+      utmSource: leadData.utm_source || null,
+      utmMedium: leadData.utm_medium || null,
+      utmCampaign: leadData.utm_campaign || null,
+      campaignName: leadData.campaign_name || null,
+      adName: leadData.ad_name || null,
+      formName: leadData.form_name || null,
+      formId: leadData.id || null,
+      zipCode: leadData.zip_code || null,
+      doorCondition: leadData.condition || null,
+      imageUrls: [],
+      comments: null
+    };
+
     // Create lead in database
     const createdLead = await prisma.lead.create({
-      data: {
-        firstName: leadData.full_name || '',
-        phone: phoneNumber,
-        email: leadData.email || null,
-        location: formConfig?.location || null,
-        leadType: formConfig?.leadType || null,
-        source: 'facebook_zapier',
-        utmSource: leadData.utm_source || null,
-        utmMedium: leadData.utm_medium || null,
-        utmCampaign: leadData.utm_campaign || null,
-        campaignName: leadData.campaign_name || null,
-        adName: leadData.ad_name || null,
-        formName: leadData.form_name || null,
-        formId: leadData.id || null,
-        imageUrls: [],
-        comments: null
-      },
+      data: createData as unknown as Prisma.LeadCreateInput
     });
 
     // Send email notifications

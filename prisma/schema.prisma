@@ -16,6 +16,8 @@ model Lead {
   email     String?    // Made optional
   doorIssue String?    // Made optional
   location  String?
+  zipCode   String?    // Customer's zip code
+  doorCondition String? // Condition of existing door
   
   // New fields for second step
   comments        String?
